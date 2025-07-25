@@ -1,51 +1,53 @@
-Developer Network
+# Developer Network
 
 A web application inspired by LinkedIn but tailored specifically for developers.
 
-Project Description
+# Project Description
 
 This platform allows developers to:
 
-Share posts about their work, ideas, and experiences.
+- Share posts about their work, ideas, and experiences.
 
-Showcase projects with descriptions, screenshots, and links.
+- Showcase projects with descriptions, screenshots, and links.
 
-Connect GitHub profiles to display repositories and contributions.
+- Connect GitHub profiles to display repositories and contributions.
 
-Comment on posts and projects to collaborate and give feedback.
+- Comment on posts and projects to collaborate and give feedback.
 
-Follow other developers to build a professional developer network.
+- Follow other developers to build a professional developer network.
 
-Tech Stack
+# Tech Stack
 
 This project is built with:
 
-Vite
+- Vite
 
-TypeScript
+- TypeScript
 
-React
+- React
 
-shadcn-ui
+- shadcn-ui
 
-Tailwind CSS
+- Tailwind CSS
 
-Getting Started
+# Getting Started
 
 To run this project locally:
 
-# Clone the repository
+```sh
+# Step 1: Clone the repository using the project's Git URL.
 git clone <YOUR_GIT_URL>
 
-# Navigate to the project directory
+# Step 2: Navigate to the project directory.
 cd <YOUR_PROJECT_NAME>
 
-# Install dependencies
-npm install
+# Step 3: Install the necessary dependencies.
+npm i
 
-# Start the development server
+# Step 4: Start the development server with auto-reloading and an instant preview.
 npm run dev
+```
 
-Contributing
+# Contributing
 
 Feel free to fork this repository, open issues, and submit pull requests to improve the platform.
