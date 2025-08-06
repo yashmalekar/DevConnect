@@ -6,27 +6,54 @@ import { Badge } from '@/components/ui/badge';
 import { Github, ExternalLink } from 'lucide-react';
 import { AvatarFallback, Avatar, AvatarImage } from '@/components/ui/avatar';
 import { useNavigate } from 'react-router-dom';
-import { getProjects } from '../../backend/utils.js'
-import { useSelector } from 'react-redux';
+import { Skeleton } from '@/components/ui/skeleton';
+
+const SkeletonCard = () =>{
+  return (
+    <Card className='bg-slate-800/50 border-slate-700'>
+      <Skeleton className='w-full h-48 bg-slate-700' />
+      <CardHeader className='pb-3'>
+        <Skeleton className='h-5 w-1/2 bg-slate-700' />
+        <Skeleton className='h-4 w-full bg-slate-700' />
+        <Skeleton className='h-4 w-full bg-slate-700' />
+      </CardHeader>
+      <CardContent className='space-y-4'>
+        <div className='flex gap-2'>
+          <Skeleton className='h-4 w-14 bg-slate-700' />
+          <Skeleton className='h-4 w-14 bg-slate-700' />
+          <Skeleton className='h-4 w-14 bg-slate-700' />
+          <Skeleton className='h-4 w-14 bg-slate-700' />
+        </div>
+        <div className="flex items-center justify-between border-t border-slate-700">
+          <div className='flex items-center space-x-2 pt-2'>
+            <Skeleton className='h-9 w-9 rounded-full bg-slate-700' />
+            <Skeleton className='h-4 w-28 bg-slate-700' />
+            </div>
+        </div>
+        <div className='flex space-x-2 pt-2'>
+          <Skeleton className='flex-1 h-9 bg-slate-700' />
+          <Skeleton className='h-9 w-12 bg-slate-700' />
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
 
 const Projects = () => {
 
   const navigate = useNavigate();
-  const data = useSelector((state)=>state.auth.projectData);
+  const [loading,setLoading] = useState(true);
 
   useEffect(() => {
-    if(data){
-      setProjects(data);
-    }else{
-      getProject();
-    }
+    getProject();
     window.scrollTo(0,0);
   }, [])
 
   const [projects, setProjects] = useState([]);
 
   const getProject = async ()=>{
-    setProjects(await getProjects());
+    setProjects(await fetch('http://localhost:5000/get-projects').then(res=>res.json()));
+    setLoading(false);
   }
 
   const handleAuthClick = (username:string) =>{
@@ -46,7 +73,12 @@ const Projects = () => {
         </div>
 
         <div className="grid md:grid-cols-2 gap-8">
-          {projects.map((project) => (
+
+          {loading && Array.from({length:4}).map((_,index)=>(
+            <SkeletonCard key={`skeleton-${index}`} />
+          ))}
+
+          {projects && projects.map((project) => (
             <Card key={project.id} className="bg-slate-800/50 border-slate-700 overflow-hidden hover:bg-slate-800/70 transition-all duration-300 hover:scale-105 group">
                 <img 
                   src={project.image} 

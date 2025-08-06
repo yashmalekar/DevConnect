@@ -15,6 +15,11 @@ import AddProject from "./pages/AddProject";
 import CreatePost from "./pages/CreatePost";
 import AuthListener from '../backend/AuthListener.tsx'
 import Comments from "./pages/Comments.tsx";
+import Posts from "./pages/Posts.tsx";
+import UserProjects from "./pages/UserProjects.tsx";
+import Followers from "./pages/Followers.tsx";
+import Following from "./pages/Following.tsx";
+import Chat from "./pages/Chat.tsx"
 
 const queryClient = new QueryClient();
 
@@ -36,6 +41,12 @@ const App = () => (
           <Route path="/feed" element={<Feed />} />
           <Route path="/post/:postId" element={<Comments />} />
           <Route path="/feed/create" element={<CreatePost />} />
+          <Route path ="/dashboard/posts" element={<Posts />} />
+          <Route path ="/dashboard/projects" element={<UserProjects />} />
+          <Route path ="/dashboard/followers" element={<Followers />} />
+          <Route path ="/dashboard/following" element={<Following />} />
+          <Route path="/chat" element={<Chat />} />
+          <Route path="/chat/:username" element={<Chat />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

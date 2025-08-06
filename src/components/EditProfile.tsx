@@ -10,7 +10,6 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Github, Mail, User, MapPin, Link as LinkIcon, Briefcase, X, Save, ArrowLeft, Trash2, Camera } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { deleteUserAuth } from '../../backend/config.js'
-import { updateUserData } from '../../backend/utils.js'
 import { useToast } from '@/hooks/use-toast.js';
 import bcrypt from 'bcryptjs';
 import { uploadToCloudinary , deleteProfileImage } from '../../backend/utils.js'
@@ -85,6 +84,7 @@ const EditProfile: React.FC<EditProfileProps> = ({ user, data, onBack }) => {
   const handleDeleteProfileImage = async () => {
     const updatedData = {...existingData, profilePicture: ''};
     setExistingData(updatedData);
+    await fetch(`http://localhost:5000/update-userData?uid=${encodeURIComponent(user.uid)}`,{method:"POST",headers:{'Content-Type':'application/json'},body:JSON.stringify(updatedData)});
     await deleteProfileImage(`profile_${user.uid}`);
   };
 
@@ -95,7 +95,7 @@ const EditProfile: React.FC<EditProfileProps> = ({ user, data, onBack }) => {
       try {
         profilePicture = await uploadToCloudinary(selectedFile,user.uid);
         const updatedData = { ...formData, skills, profilePicture};
-        await updateUserData(user.uid,updatedData);
+        await fetch(`http://localhost:5000/update-userData?uid=${encodeURIComponent(user.uid)}`,{method:"POST",headers:{'Content-Type':'application/json'},body:JSON.stringify(updatedData)});
         onBack(); // Go back to dashboard
       } catch (err) {
         console.error('Image upload failed:', err);
@@ -109,7 +109,7 @@ const EditProfile: React.FC<EditProfileProps> = ({ user, data, onBack }) => {
     }else{
       // Save updated profile data
       const updatedData = { ...formData, skills};
-      await updateUserData(user.uid,updatedData);
+      await fetch(`http://localhost:5000/update-userData?uid=${encodeURIComponent(user.uid)}`,{method:"POST",headers:{'Content-Type':'application/json'},body:JSON.stringify(updatedData)});
       onBack(); // Go back to dashboard
     }
   };

@@ -22,7 +22,7 @@ export const ProjectsPreview = () => {
   const [projects, setProjects] = useState([]);
   
   const getProject = async ()=>{
-    setProjects(await getProjects());
+    setProjects(await fetch('http://localhost:5000/get-projects').then(res=>res.json()));
   }
 
   return (

@@ -9,19 +9,17 @@ import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
 import { ArrowLeft, Plus, X, Send, Image } from 'lucide-react';
 import { useSelector } from 'react-redux';
-import { handlePostSubmit } from '../../backend/utils.js'
-import { serverTimestamp } from 'firebase/firestore'
+import { toast } from '@/hooks/use-toast.js';
 
 const CreatePost = () => {
   const navigate = useNavigate();
   const data = useSelector((state)=>state.auth.data);
   const [gitUrl, setGitUrl] = useState('');
   const [postData, setPostData] = useState({
-    id: data.uid,
+    uid: data.uid,
     author: data.firstName + ' ' +  data.lastName,
     avatar: data.profilePicture || '',
     username: data.username,
-    time: serverTimestamp(),
     content: '',
     tags: [] as string[],
     githubLink: gitUrl || data.githubUrl || '',
@@ -50,9 +48,20 @@ const CreatePost = () => {
     e.preventDefault();
     
     //Send post data to Firebase
-    const res = await handlePostSubmit(postData);
-    if(res)
-      navigate(res);  
+    const res = await fetch('http://localhost:5000/create-post', { method:'POST',headers:{'Content-Type':'application/json'},body: JSON.stringify(postData)});
+    if(res){
+      toast({
+        title: "Post Published Successfully!",
+        description: "Your post has been shared with the developer community.",
+        className: "bg-green-600 text-white border-green-500",
+      });
+      navigate('/feed');  
+    }else{
+    toast({
+        variant:"destructive",
+        title:`${res.json()}`
+      })
+    }
   };
 
   return (

@@ -42,6 +42,10 @@ const SignUp = () => {
 
     profilePicture: '',
     
+    followers: [],
+    following: [],
+    projects: [],
+    
     // Preferences
     agreeToTerms: false
   });

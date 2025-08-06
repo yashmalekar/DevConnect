@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
 import { ArrowLeft, Plus, X, Github } from 'lucide-react';
 import { useSelector } from 'react-redux';
-import { handleProjectSubmit } from '../../backend/utils.js'
+import { toast } from '@/hooks/use-toast.js';
 
 const AddProject = () => {
   const navigate = useNavigate();
@@ -54,10 +54,22 @@ const AddProject = () => {
     e.preventDefault();
 
     //Send project data to firebase
-    const res = await handleProjectSubmit(projectData);
-    if(res)
-      navigate(res)
-  };
+    const res = await fetch(`http://localhost:5000/create-project?userId=${encodeURIComponent(data.uid)}`, { method:'POST',headers:{'Content-Type':'application/json'},body: JSON.stringify(projectData)});
+    if(res){
+      toast({
+        title: "Project Created Successfully!",
+        description: "Your project has been added to your portfolio.",
+        className: "bg-green-600 text-white border-green-500",
+      });
+      navigate('/projects');
+  }else{
+    toast({
+      variant:"destructive",
+      title:`${res.json()}`
+    })
+  }
+}
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
@@ -67,7 +79,7 @@ const AddProject = () => {
         <div className="flex items-center mb-8">
           <Button
             variant="default"
-            onClick={() => navigate('/dashboard')}
+            onClick={() => navigate(-1)}
             className="text-slate-300 hover:text-white bg-transparent hover:bg-transparent mr-4"
           >
             <ArrowLeft className="w-4 h-4" />

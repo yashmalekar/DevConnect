@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Search, User, Users, Github, LogOut } from 'lucide-react';
+import { Search,MessageSquare, User, Users, Github, LogOut } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { clearUser } from '../../Redux/authSlice'
 import { auth } from '../../backend/config'
@@ -70,6 +70,11 @@ export const Header = () => {
             
             {user ? (
               <>
+                <Link to="/chat">
+                  <Button variant="ghost" size="icon" className="text-slate-300 hover:text-white">
+                    <MessageSquare className="w-4 h-4" />
+                  </Button>
+                </Link>
                 <Link to="/dashboard">
                   <Button variant="ghost" size="icon" className="text-slate-300 bg-slate-700">
                     <User className="w-4 h-4" />

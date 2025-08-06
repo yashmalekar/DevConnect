@@ -1,32 +1,22 @@
-
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Heart, MessageSquare, Github, ExternalLink } from 'lucide-react';
-import { getPosts } from '../../backend/utils.js'
+import { Heart, MessageSquare, Github } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
-import { useSelector } from 'react-redux';
 
 export const FeedPreview = () => {
-
-  const data = useSelector((state)=>state.auth.postData)
   const [posts, setPosts] = useState([]);
 
   useEffect(() => {
-    if(data)
-      {
-        setPosts(data);
-      }
-      else
-        getPost();
+    getPost();
   }, [])
 
     const getPost = async () => {
-      const posts1= await getPosts();
-      setPosts(posts1.posts);
+      const posts1= await fetch('http://localhost:5000/get-posts',{method:"GET"}).then(res => res.json());
+      setPosts(posts1);
     };
 
   return (
@@ -39,7 +29,7 @@ export const FeedPreview = () => {
       </div>
 
       <div className="grid gap-6 max-w-4xl mx-auto">
-        {[...posts].sort(()=>Math.random()-0.5).slice(0,3).map((post) => (
+        {posts.sort(()=>Math.random()-0.5).slice(0,3).map((post) => (
           <Card key={post.id} className="bg-slate-800/50 border-slate-700 hover:bg-slate-800/70 transition-all duration-300 hover:scale-[1.02]">
             <CardHeader className="pb-3">
               <div className="flex items-center space-x-3">
@@ -54,7 +44,7 @@ export const FeedPreview = () => {
                     <h3 className="font-semibold text-white">{post.author}</h3>
                     <span className="text-slate-400 text-sm">{post.username}</span>
                     <span className="text-slate-500 text-sm">·</span>
-                    <span className="text-slate-400 text-sm">{post.time?.seconds? formatDistanceToNow(new Date(post.time.seconds * 1000), { addSuffix: true }): "just now"}</span>
+                    <span className="text-slate-400 text-sm">{post.createdAt?.seconds? formatDistanceToNow(new Date(post.createdAt.seconds * 1000), { addSuffix: true }): "just now"}</span>
                   </div>
                 </div>
                 {post.githubLink && (

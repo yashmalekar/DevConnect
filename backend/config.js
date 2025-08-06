@@ -2,7 +2,7 @@ import { initializeApp } from "firebase/app";
 import { getAuth, GithubAuthProvider, GoogleAuthProvider , signInWithPopup, createUserWithEmailAndPassword , signInWithEmailAndPassword, deleteUser, EmailAuthProvider, reauthenticateWithCredential, setPersistence, browserLocalPersistence, reauthenticateWithPopup } from 'firebase/auth'
 import { setUser } from '../Redux/authSlice'
 import { store } from '../Redux/store'
-import { deleteDoc, doc, getDoc, getFirestore, setDoc } from 'firebase/firestore'
+import { deleteDoc, doc, getDoc, getFirestore, serverTimestamp, setDoc } from 'firebase/firestore'
 import bcrypt from 'bcryptjs'
 import { toast } from "../src/hooks/use-toast";
 
@@ -58,6 +58,10 @@ const handleGoogleAuthLogin = async ()=>{
         githubUrl:'',
         linkedinUrl:"",
         portfolioUrl:"",
+        followers: [],
+        following: [],
+        projects: [],
+        createdAt: serverTimestamp(),
         agreeToTerms:true,
         skills:[]
       })
@@ -109,6 +113,10 @@ const githubUser = await githubUserRes.json();
         githubUrl:`https://github.com/${user.screenName}`,
         linkedinUrl:"",
         portfolioUrl:"",
+        followers: [],
+        following: [],
+        projects: [],
+        createdAt: serverTimestamp(),
         agreeToTerms:true,
         skills:[]
       })
@@ -125,7 +133,7 @@ const githubUser = await githubUserRes.json();
 }
 
 const handleEmailSignUp = async (formData)=>{
-  const {firstName, lastName, email, password, confirmPassword, username, bio, location, jobTitle, company, experience, githubUrl, linkedinUrl, portfolioUrl, profilePicture, agreeToTerms, skills} = formData;
+  const {firstName, lastName, email, password, confirmPassword, username, bio, location, jobTitle, company, experience, githubUrl, linkedinUrl, portfolioUrl, profilePicture,followers,following,projects, agreeToTerms, skills} = formData;
   try{
     await setPersistence(auth, browserLocalPersistence);
     const userCred = await createUserWithEmailAndPassword(auth,email,password);
@@ -149,6 +157,10 @@ const handleEmailSignUp = async (formData)=>{
       githubUrl,
       linkedinUrl,
       portfolioUrl,
+      followers,
+      following,
+      projects,
+      createdAt: serverTimestamp(),
       agreeToTerms,
       skills
     })

@@ -28,19 +28,19 @@ const AuthListener = ({ children }) => {
     return () => unsubscribe();
   }, [dispatch]);
 
-  if (loading) {
-    return (
-    <div className="w-full min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f2937_1px,transparent_1px),linear-gradient(to_bottom,#1f2937_1px,transparent_1px)] bg-[size:4rem_4rem] opacity-20"></div>
-      {loading && (
-        <div className="flex items-center space-x-2 text-xl">
-          <Loader className="w-4 h-4 mr-2 animate-spin" />
-          Loading...
-        </div>
-      )}
-      </div>
-    ); // or spinner
-  }
+  // if (loading) {
+  //   return (
+  //   <div className="w-full min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
+  //     <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f2937_1px,transparent_1px),linear-gradient(to_bottom,#1f2937_1px,transparent_1px)] bg-[size:4rem_4rem] opacity-20"></div>
+  //     {loading && (
+  //       <div className="flex items-center space-x-2 text-xl">
+  //         <Loader className="w-4 h-4 mr-2 animate-spin" />
+  //         Loading...
+  //       </div>
+  //     )}
+  //     </div>
+  //   ); // or spinner
+  // }
 
   return children; // ✅ finally render the app
 };

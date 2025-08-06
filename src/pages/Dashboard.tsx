@@ -8,50 +8,32 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Users, Github, MessageSquare, Heart, TrendingUp, Calendar, MapPin, Linkedin, ExternalLink } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
-import { getUserData, getUserPostCount, getUserProjectCount} from '../../backend/utils.js'
 import { setData } from '../../Redux/authSlice.js'
 import TrendingContent from '@/components/TrendingContent.js';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [showEditProfile, setShowEditProfile] = useState(false);
-  const [postCount, setPostCount] = useState('0');
-  const [projectCount, setProjectCount] = useState('0');
   const [userData, setUserData] = useState<any>({});
-  const user = useSelector((state)=>state.auth.user)
-  const data = useSelector((state)=>state.auth.data);
+  const user = useSelector((state)=>state.auth.user);
 
   useEffect(()=>{
     const isAuthenticated = user;
     if(!isAuthenticated)
       navigate('/signin')
-    if (!data) {
-      getData(); // Only fetch if not already present
-    } 
-    else {
-      setUserData(data); // Use Redux data
-    }
-    updatePostCount();
-    updateProjectCount();
-    window.scrollTo(0,0);
-  },[data]);
+    if(user)
+      getData();
+  },[user]);
 
   const getData = async ()=>{
     //Load user data
-  const storedUserData = await getUserData(user.uid);
+  const storedUserData = await fetch(`http://localhost:5000/get-userData?uid=${encodeURIComponent(user.uid)}`, { method: 'GET'}).then(res => res.json());
   if (storedUserData) {
     dispatch(setData(storedUserData)); // store in redux
     setUserData(storedUserData);       // store in local state
   }
-  }
-
-  const updatePostCount = async ()=>{
-    setPostCount(await getUserPostCount(user.uid))
-  }
-
-  const updateProjectCount = async ()=>{
-    setProjectCount(await getUserProjectCount(user.uid));
   }
 
   // Refresh user data when returning from edit profile
@@ -70,19 +52,16 @@ const Dashboard = () => {
     );
   }
 
-  const userEmail = user.email;
-  const userName = user.reloadUserInfo.screenName || userData.username || ""
-  const displayName = user.reloadUserInfo.displayName || userData.firstName + " " + userData.lastName || ""
-  const joinedAt = new Date(user.metadata.creationTime).toLocaleDateString('en-GB',{
-    month:'long',
-    year:'numeric'
-  })
+  const userEmail = userData.email;
+  const userName = userData.username || ""
+  const displayName = userData.firstName + " " + userData.lastName || ""
+  const joinedAt = userData.createdAt ? new Date(userData.createdAt._seconds * 1000).toLocaleString('en-US', { month: 'long', year: 'numeric' }) : '';
 
   const stats = [
-    { label: 'Posts', value: postCount, icon: MessageSquare, color: 'text-blue-400' },
-    { label: 'Followers', value: '248', icon: Users, color: 'text-green-400' },
-    { label: 'Following', value: '189', icon: Heart, color: 'text-purple-400' },
-    { label: 'Projects', value: projectCount, icon: Github, color: 'text-yellow-400' }
+    { label: 'Posts', value: userData.posts ?  userData.posts.length : '0', icon: MessageSquare, color: 'text-blue-400' },
+    { label: 'Followers', value: userData.followers ? userData.followers.length : '0', icon: Users, color: 'text-green-400' },
+    { label: 'Following', value: userData.following ? userData.following.length : '0', icon: Heart, color: 'text-purple-400' },
+    { label: 'Projects', value: userData.projects ? userData.projects.length : '0', icon: Github, color: 'text-yellow-400' }
   ];
 
   return (
@@ -96,12 +75,25 @@ const Dashboard = () => {
             <Card className="bg-slate-800/50 border-slate-700">
               <CardContent className="p-6">
                 <div className="text-center space-y-4">
-                  <Avatar className="w-24 h-24 mx-auto">
-                    <AvatarImage src={user.photoURL || userData.profilePicture || ""} />
-                    <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-600 text-white text-2xl">
-                      {userName.charAt(0).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Avatar className="w-24 h-24 mx-auto cursor-pointer hover:opacity-90 transition-opacity">
+                      <AvatarImage src={userData.profilePicture || ""} />
+                      <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-600 text-white text-2xl">
+                        {userName.charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                        </Avatar>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-md p-0 border-0 bg-transparent">
+                      <div className="relative">
+                        <img
+                          src={userData.profilePicture || ""}
+                          alt="Profile"
+                          className="w-full h-auto max-h-[80vh] object-contain rounded-lg"
+                        />
+                      </div>
+                    </DialogContent>
+                </Dialog>
                   
                   <div>
                     <h2 className="text-2xl font-bold text-white capitalize">{displayName}</h2>
@@ -202,7 +194,7 @@ const Dashboard = () => {
             {/* Stats Cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {stats.map((stat, index) => (
-                <Card key={index} className="bg-slate-800/50 border-slate-700">
+                <Card key={index} onClick={()=>navigate(`/dashboard/${stat.label.toLowerCase()}`)} className="bg-slate-800/50 border-slate-700 cursor-pointer hover:bg-slate-800/70 transition-all duration-300 hover:scale-105">
                   <CardContent className="p-4 text-center">
                     <div className={`inline-flex items-center justify-center w-8 h-8 rounded-lg bg-slate-700/50 ${stat.color} mb-2`}>
                       <stat.icon className="w-4 h-4" />
