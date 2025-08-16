@@ -3,18 +3,9 @@ import { getAuth, GithubAuthProvider, GoogleAuthProvider , signInWithPopup, crea
 import { setUser } from '../Redux/authSlice'
 import { store } from '../Redux/store'
 import { deleteDoc, doc, getDoc, getFirestore, serverTimestamp, setDoc } from 'firebase/firestore'
-import bcrypt from 'bcryptjs'
 import { toast } from "../src/hooks/use-toast";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyDvdgL6-zePFf1Q4RvOTlJEr9X-jjF3FH4",
-  authDomain: "devconnect-27473.firebaseapp.com",
-  projectId: "devconnect-27473",
-  storageBucket: "devconnect-27473.firebasestorage.app",
-  messagingSenderId: "51021702420",
-  appId: "1:51021702420:web:c6ee2d7f29b8f885490e01",
-  measurementId: "G-NSTG1JQPBV"
-};
+import { firebaseConfig } from './firebaseConfig.js'
+import bcrypt from 'bcryptjs'
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);

@@ -134,7 +134,7 @@ const Posts = () => {
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
                         <Avatar className="w-10 h-10">
-                          <Link to={`/profile/${post.uid}`}>
+                          <Link to={`/profile/${post.username}`}>
                             <AvatarImage src={post.avatar} />
                             <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-600 text-white">
                               {post.username.charAt(0).toUpperCase()}
@@ -142,7 +142,7 @@ const Posts = () => {
                           </Link>
                         </Avatar>
                         <div>
-                          <Link to={`/profile/${post.uid}`} className="font-medium text-white hover:underline cursor-pointer">{post.author}</Link>
+                          <Link to={`/profile/${post.username}`} className="font-medium text-white hover:underline cursor-pointer">{post.author}</Link>
                           <div className="flex items-center text-slate-400 text-sm">
                             <Calendar className="w-3 h-3 mr-1" />
                             {post.createdAt?._seconds? formatDistanceToNow(new Date(post.createdAt._seconds * 1000), { addSuffix: true }): "just now"}

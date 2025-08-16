@@ -24,3 +24,4 @@ dist-ssr
 *.sw?
 
 backend/devconnect.json
+backend/firebaseConfig.js
