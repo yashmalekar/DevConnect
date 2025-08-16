@@ -4,19 +4,11 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { AvatarFallback, Avatar, AvatarImage } from '@/components/ui/avatar';
 import { Link } from 'react-router-dom';
-import { getProjects } from '../../backend/utils.js'
-import { useSelector } from 'react-redux';
 
 export const ProjectsPreview = () => {
 
-  const data = useSelector((state)=>state.auth.projectData);
-
   useEffect(() => {
-    if(data){
-      setProjects(data);
-    }else{
-      getProject();
-    }
+    getProject();
   }, [])
   
   const [projects, setProjects] = useState([]);
@@ -36,7 +28,7 @@ export const ProjectsPreview = () => {
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         {[...projects].sort(()=>Math.random()-0.5).slice(0,3).map((project) => (
-          <Card key={project.id} className="bg-slate-800/50 border-slate-700 overflow-hidden hover:bg-slate-800/70 transition-all duration-300 hover:scale-105 group">
+          <Card key={project.docId} className="bg-slate-800/50 border-slate-700 overflow-hidden hover:bg-slate-800/70 transition-all duration-300 hover:scale-105 group">
             <div className="relative overflow-hidden">
               <img 
                 src={project.image} 
@@ -56,15 +48,43 @@ export const ProjectsPreview = () => {
             
             <CardContent className="space-y-4">
               <div className="flex flex-wrap gap-2">
-                {project.tech.map((tech) => (
+                {project.tech.slice(0,3).map((tech) => (
                   <Badge key={tech} variant="secondary" className="bg-purple-500/20 text-purple-300 hover:bg-purple-500/30 text-xs">
                     {tech}
                   </Badge>
                 ))}
+                {project.tech.length > 3 &&(
+                    <Badge 
+                      variant="default" 
+                      className="bg-purple-500/20 text-purple-300 hover:bg-purple-500/30 cursor-pointer"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const techContainer = e.currentTarget.parentElement;
+                        const hiddenTechs = techContainer?.querySelectorAll('.hidden-tech');
+                        const moreButton = e.currentTarget;
+                        
+                        if (hiddenTechs) {
+                          hiddenTechs.forEach(tech => tech.classList.toggle('hidden'));
+                          moreButton.style.display = 'none';
+                        }
+                      }}
+                    >
+                      +{project.tech.length - 3} more
+                    </Badge>
+                  )}
+                  {project.tech.slice(3).map((skill) => (
+                    <Badge 
+                      key={skill} 
+                      variant="default" 
+                      className="bg-purple-500/20 text-purple-300 hover:bg-purple-500/30 hidden-tech hidden"
+                    >
+                      {skill}
+                    </Badge>
+                  ))}
               </div>
               
                 <div className="flex items-center justify-between pt-4 border-t border-slate-700">
-                  <div className="flex items-center space-x-3">
+                  <Link to={`/profile/${project.username}`} className="flex items-center space-x-3">
                     <Avatar className="w-8 h-8 mx-auto">
                     <AvatarImage src={project.avatar || ""} alt={project.author || ""} />
                     <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-600 text-white">
@@ -72,7 +92,7 @@ export const ProjectsPreview = () => {
                     </AvatarFallback>
                   </Avatar>
                     <span className="text-slate-300 text-sm">by {project.author}</span>
-                  </div>
+                  </Link>
                 </div>
             </CardContent>
           </Card>

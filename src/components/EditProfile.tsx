@@ -389,7 +389,7 @@ const EditProfile: React.FC<EditProfileProps> = ({ user, data, onBack }) => {
                         {skills.map((skill, index) => (
                           <Badge
                             key={index}
-                            variant="secondary"
+                            variant="default"
                             className="bg-blue-500/20 text-blue-300 pr-1"
                           >
                             {skill}

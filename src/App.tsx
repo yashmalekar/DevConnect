@@ -20,6 +20,7 @@ import UserProjects from "./pages/UserProjects.tsx";
 import Followers from "./pages/Followers.tsx";
 import Following from "./pages/Following.tsx";
 import Chat from "./pages/Chat.tsx"
+import Profile from "./pages/Profile.tsx";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +42,7 @@ const App = () => (
           <Route path="/feed" element={<Feed />} />
           <Route path="/post/:postId" element={<Comments />} />
           <Route path="/feed/create" element={<CreatePost />} />
+          <Route path='/profile/:username' element={<Profile />} />
           <Route path ="/dashboard/posts" element={<Posts />} />
           <Route path ="/dashboard/projects" element={<UserProjects />} />
           <Route path ="/dashboard/followers" element={<Followers />} />

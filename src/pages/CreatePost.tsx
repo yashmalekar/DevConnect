@@ -10,11 +10,13 @@ import { Label } from '@/components/ui/label';
 import { ArrowLeft, Plus, X, Send, Image } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { toast } from '@/hooks/use-toast.js';
+import { uploadPostImage } from '../../backend/utils.js'
 
 const CreatePost = () => {
   const navigate = useNavigate();
   const data = useSelector((state)=>state.auth.data);
   const [gitUrl, setGitUrl] = useState('');
+  const [imageFiles, setImageFiles] = useState<File[] | null>(null);
   const [postData, setPostData] = useState({
     uid: data.uid,
     author: data.firstName + ' ' +  data.lastName,
@@ -46,9 +48,22 @@ const CreatePost = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    //Send post data to Firebase
-    const res = await fetch('http://localhost:5000/create-post', { method:'POST',headers:{'Content-Type':'application/json'},body: JSON.stringify(postData)});
+
+    let res=null;
+    //Upload Post images to cloudinary
+    if(imageFiles){
+      let updatedData = {...postData};
+      if(imageFiles.length>0){
+        const imagesRes = await uploadPostImage(imageFiles,data.uid);
+        const imageArray = imagesRes.map((image: any) => image.url);
+        updatedData = {...updatedData,images:imageArray};
+      }
+  
+      //Send post data to Firebase
+      res = await fetch('http://localhost:5000/create-post', { method:'POST',headers:{'Content-Type':'application/json'},body: JSON.stringify(updatedData)});
+    }else{
+      res = await fetch('http://localhost:5000/create-post', { method:'POST',headers:{'Content-Type':'application/json'},body: JSON.stringify(postData)});
+    }
     if(res){
       toast({
         title: "Post Published Successfully!",
@@ -105,18 +120,37 @@ const CreatePost = () => {
               <div className="space-y-2">
                 <Label className="text-slate-300">Images</Label>
                 <div className="flex items-center space-x-2">
+                  <Input accept='image/*' type='file' id='Images' className='hidden' multiple  onChange={(e)=>{
+                    const files = e.target.files;
+                    if(files){
+                      setImageFiles(Array.from(files));
+                    }
+                  }} />
                   <Button
                     type="button"
                     variant="outline"
                     className="border-slate-600 text-slate-700 hover:text-white hover:bg-slate-700"
+                    onClick={() => document.getElementById('Images')?.click()}
                   >
                     <Image className="w-4 h-4 mr-2" />
                     Add Image
                   </Button>
-                  <span className="text-sm text-slate-400">
-                    {postData.images.length}/4 images
-                  </span>
-                </div>
+                  </div>
+                    {/* {imageFiles &&imageFiles.length}/4 images */}
+                    {imageFiles && imageFiles.map((image,index)=>(
+                      <div className="grid grid-cols-2 gap-2 mt-4">
+                        <div className="relative group" key={index}>
+                          <img src={URL.createObjectURL(image)} className='w-full h-52 object-cover rounded-lg' alt={`Upload ${index + 1}`} />
+                          <button 
+                            type="button"
+                            onClick={() => setImageFiles(imageFiles.filter((_, i) => i !== index))}
+                            className="absolute top-2 right-2 bg-red-600 hover:bg-red-700 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
               </div>
               <div className="space-y-2">
                 <Label className="text-slate-300">Tags</Label>

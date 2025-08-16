@@ -15,7 +15,6 @@ const uploadToCloudinary = async (file,uid) =>{
   }
 }
 
-
 const deleteProfileImage = async (uid) => {
   const res = await fetch('http://localhost:5000/delete-profile', {
     method:'POST',
@@ -41,7 +40,9 @@ const handleFollow = async (targetUid, followerUid, alreadyFollowing) => {
 const uploadPostImage = async (files,uid) =>{
   try {
     const formData = new FormData();
-    formData.append('images', files);
+    files.forEach(file => {
+      formData.append('images',file);
+    })
     formData.append('userId',uid);
     const res = await fetch('http://localhost:5000/upload-post-image', {
       method:'POST',
@@ -51,7 +52,7 @@ const uploadPostImage = async (files,uid) =>{
     const data = await res.json();
     return data.uploads;
   } catch (error) {
-    console.log()
+    console.log(error)
   }
 }
 
@@ -64,4 +65,10 @@ const deletePostImage = async (uid) => {
   })
 }
 
-export {uploadToCloudinary, deleteProfileImage, handleFollow, uploadPostImage, deletePostImage};
+const getProfileData = async (username) =>{
+  const users = await fetch('http://localhost:5000/get-users').then(res=>res.json());
+  const user = users.find(user=>user.username===username);
+  return user;
+}
+
+export {uploadToCloudinary, deleteProfileImage, handleFollow, uploadPostImage, deletePostImage, getProfileData};

@@ -80,15 +80,38 @@ const UserProjects = () => {
               <CardContent className="space-y-4">
                 <div className="flex flex-wrap gap-1">
                   {project.tech.slice(0, 3).map((tech) => (
-                    <Badge key={tech} variant="outline" className="text-xs border-slate-600 text-slate-400">
+                    <Badge key={tech} variant="default" className="bg-blue-500/20 cursor-pointer text-blue-300 text-xs">
                       {tech}
                     </Badge>
                   ))}
                   {project.tech.length > 3 && (
-                    <Badge variant="outline" className="text-xs border-slate-600 text-slate-400">
-                      +{project.tech.length - 3}
+                    <Badge 
+                      variant="default" 
+                      className="bg-blue-500/20 cursor-pointer text-blue-300 text-xs"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const techContainer = e.currentTarget.parentElement;
+                        const hiddenTechs = techContainer?.querySelectorAll('.hidden-tech');
+                        const moreButton = e.currentTarget;
+                        
+                        if (hiddenTechs) {
+                          hiddenTechs.forEach(tech => tech.classList.toggle('hidden'));
+                          moreButton.style.display = 'none';
+                        }
+                      }}
+                    >
+                      +{project.tech.length - 3} more
                     </Badge>
                   )}
+                  {project.tech.slice(3).map((skill) => (
+                    <Badge 
+                      key={skill} 
+                      variant="default" 
+                      className="bg-blue-500/20 cursor-pointer text-blue-300 text-xs hidden-tech hidden"
+                    >
+                      {skill}
+                    </Badge>
+                  ))}
                 </div>
                 {(project.githubUrl || project.demoUrl) && (
                 <div className="text-center border-t border-slate-700" />
@@ -99,7 +122,7 @@ const UserProjects = () => {
                     <Button
                     size="sm"
                     variant="outline"
-                    className="flex-1 border-slate-600 text-slate-700 hover:bg-slate-700 hover:text-white"
+                    className="flex-1 border-slate-600 text-slate-700 hover:bg-primary hover:text-white"
                     onClick={() => window.open(project.githubUrl, '_blank')}
                     >
                       <Github className="w-4 h-4 mr-1" />

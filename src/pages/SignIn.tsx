@@ -44,10 +44,10 @@ const SignIn = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-6">
-        {/* Back to Home */}
-        <Link to="/" className="inline-flex items-center text-slate-300 hover:text-white transition-colors">
+        {/* Back */}
+        <Link to='/' className="inline-flex items-center text-slate-300 hover:text-white transition-colors">
           <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to Home
+          Back
         </Link>
 
         {/* Logo */}

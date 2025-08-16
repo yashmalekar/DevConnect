@@ -1,25 +1,19 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { TrendingUp, MessageSquare } from 'lucide-react';
+import { formatDistanceToNow } from 'date-fns';
 
 const TrendingContent = () => {
-  const trendingPosts = [
-    { 
-      title: "New React 19 Features That Will Change Everything", 
-      author: "@sarah_dev", 
-      time: "4 hours ago"
-    },
-    { 
-      title: "Building Scalable APIs with TypeScript", 
-      author: "@mike_codes", 
-      time: "8 hours ago"
-    },
-    { 
-      title: "AI Integration in Modern Web Apps", 
-      author: "@alex_tech", 
-      time: "12 hours ago"
-    }
-  ];
+  const [trendingPosts, setTrendingPosts] = useState([]);
+
+  useEffect(() => {
+    getPosts();
+  }, []);
+
+  const getPosts = async ()=>{
+    const data = await fetch('http://localhost:5000/get-posts',{method:"GET"});
+    setTrendingPosts(await data.json());
+  }
 
   return (
     <Card className="bg-slate-800/50 border-slate-700">
@@ -38,11 +32,15 @@ const TrendingContent = () => {
           </h4>
           <div className="space-y-3">
             {trendingPosts.map((post, index) => (
-              <div key={index} className="p-3 rounded-lg bg-slate-700/30 hover:bg-slate-700/50 transition-colors cursor-pointer">
-                <h5 className="text-slate-200 text-sm font-medium mb-1">{post.title}</h5>
-                <div className="flex items-center justify-between text-xs text-slate-400">
-                  <span>by {post.author} • {post.time}</span>
-                </div>
+              <div>
+                {(post.likes && post.likes.length >2)  && (
+                  <div key={index} className="p-3 rounded-lg bg-slate-700/30 hover:bg-slate-700/50 transition-colors cursor-pointer">
+                    <h5 className="text-slate-200 text-sm font-medium mb-1">{post.content}</h5>
+                    <div className="flex items-center justify-between text-xs text-slate-400">
+                      <span>by {post.author} • {post.createdAt?._seconds? formatDistanceToNow(new Date(post.createdAt._seconds * 1000), { addSuffix: true }): "just now"}</span>
+                      </div>
+                  </div>
+                )}
               </div>
             ))}
           </div>

@@ -106,7 +106,7 @@ const Following = () => {
               <Button
                 size="sm"
                 variant="outline"
-                className="border-slate-600 text-slate-400 hover:bg-slate-700 hover:text-white"
+                className="border-slate-600 text-slate-700 hover:bg-primary hover:text-white"
                 onClick={() => navigate(`/profile/${user.username.replace('@', '')}`)}
               >
                 View Profile
@@ -114,7 +114,7 @@ const Following = () => {
               <Button
                 size="sm"
                 variant="outline"
-                className="border-slate-600 text-slate-400 hover:bg-slate-700 hover:text-white"
+                className="border-slate-600 text-slate-700 hover:bg-primary hover:text-white"
               >
                 <Github className="w-4 h-4" />
               </Button>

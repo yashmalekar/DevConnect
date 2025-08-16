@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Github, ExternalLink } from 'lucide-react';
 import { AvatarFallback, Avatar, AvatarImage } from '@/components/ui/avatar';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const SkeletonCard = () =>{
@@ -56,11 +56,6 @@ const Projects = () => {
     setLoading(false);
   }
 
-  const handleAuthClick = (username:string) =>{
-    const cleanUserName = username.replace('@',"");
-    navigate(`/profile/${cleanUserName}`);
-  }
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       <Header />
@@ -79,7 +74,7 @@ const Projects = () => {
           ))}
 
           {projects && projects.map((project) => (
-            <Card key={project.id} className="bg-slate-800/50 border-slate-700 overflow-hidden hover:bg-slate-800/70 transition-all duration-300 hover:scale-105 group">
+            <Card key={project.docId} className="bg-slate-800/50 border-slate-700 overflow-hidden hover:bg-slate-800/70 transition-all duration-300 hover:scale-105 group">
                 <img 
                   src={project.image} 
                   alt={project.title}
@@ -94,15 +89,43 @@ const Projects = () => {
               
               <CardContent className="space-y-4">
                 <div className="flex flex-wrap gap-2">
-                  {project.tech.map((tech) => (
+                  {project.tech.slice(0,3).map((tech) => (
                     <Badge key={tech} variant="secondary" className="bg-purple-500/20 text-purple-300 hover:bg-purple-500/30 text-xs">
                       {tech}
+                    </Badge>
+                  ))}
+                  {project.tech.length > 3 && (
+                    <Badge 
+                      variant="default" 
+                      className="bg-purple-500/20 text-purple-300 hover:bg-purple-500/30 cursor-pointer text-xs"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const techContainer = e.currentTarget.parentElement;
+                        const hiddenTechs = techContainer?.querySelectorAll('.hidden-tech');
+                        const moreButton = e.currentTarget;
+                        
+                        if (hiddenTechs) {
+                          hiddenTechs.forEach(tech => tech.classList.toggle('hidden'));
+                          moreButton.style.display = 'none';
+                        }
+                      }}
+                    >
+                      +{project.tech.length - 3} more
+                    </Badge>
+                  )}
+                  {project.tech.slice(3).map((skill) => (
+                    <Badge 
+                      key={skill} 
+                      variant="default" 
+                      className="bg-purple-500/20 text-purple-300 hover:bg-purple-500/30 cursor-pointer text-xs hidden-tech hidden"
+                    >
+                      {skill}
                     </Badge>
                   ))}
                 </div>
 
                 <div className="flex items-center justify-between pt-4 border-t border-slate-700">
-                  <div className="flex items-center space-x-3">
+                  <Link to={`/profile/${project.username}`} className="flex items-center space-x-3">
                     <Avatar className="w-8 h-8 mx-auto">
                     <AvatarImage src={project.avatar || ""} alt={project.author || ""} />
                     <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-600 text-white">
@@ -110,7 +133,7 @@ const Projects = () => {
                     </AvatarFallback>
                   </Avatar>
                     <span className="text-slate-300 text-sm">by {project.author}</span>
-                  </div>
+                  </Link>
                 </div>
 
                 <div className="flex space-x-2 pt-2">
@@ -118,7 +141,7 @@ const Projects = () => {
                     <ExternalLink className="w-4 h-4 mr-2" />
                     View Demo
                   </Button>
-                  <Button variant="outline" className="border-slate-600 text-slate-700 hover:text-white hover:bg-slate-800">
+                  <Button variant="outline" className="border-slate-600 text-slate-700 hover:text-white hover:bg-primary">
                     <Github className="w-4 h-4 mr-2" />
                     Code
                   </Button>

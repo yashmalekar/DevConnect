@@ -24,6 +24,7 @@ const AddProject = () => {
     title: '',
     description: '',
     author: data.firstName + data.lastName,
+    username: data.username,
     avatar: data.profilePicture || '',
     githubUrl: data.githubUrl || '',
     demoUrl: '',

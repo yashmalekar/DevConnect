@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Users, Github, MessageSquare, Heart, TrendingUp, Calendar, MapPin, Linkedin, ExternalLink } from 'lucide-react';
+import { Users, Github, MessageSquare, Heart, TrendingUp, Calendar, MapPin, Linkedin, ExternalLink, Code } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setData } from '../../Redux/authSlice.js'
 import TrendingContent from '@/components/TrendingContent.js';
@@ -82,7 +82,7 @@ const Dashboard = () => {
                       <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-600 text-white text-2xl">
                         {userName.charAt(0).toUpperCase()}
                         </AvatarFallback>
-                        </Avatar>
+                    </Avatar>
                     </DialogTrigger>
                     <DialogContent className="max-w-md p-0 border-0 bg-transparent">
                       <div className="relative">
@@ -134,12 +134,34 @@ const Dashboard = () => {
                         </Badge>
                       ))}
                       {userData.skills.length > 6 && (
-                        <Badge variant="default" className="bg-gray-500/20 cursor-pointer text-gray-300 text-xs">
+                        <Badge 
+                        variant="default" 
+                        className="bg-blue-500/20 cursor-pointer text-blue-300 text-xs"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const techContainer = e.currentTarget.parentElement;
+                          const hiddenTechs = techContainer?.querySelectorAll('.hidden-tech');
+                          const moreButton = e.currentTarget;
+                          if (hiddenTechs) {
+                            hiddenTechs.forEach(tech => tech.classList.toggle('hidden'));
+                            moreButton.style.display = 'none';
+                          }
+                        }}
+                        >
                           +{userData.skills.length - 6} more
-                        </Badge>
-                      )}
-                    </div>
-                  )}
+                          </Badge>
+                        )}
+                        {userData.skills.slice(6).map((skill) => (
+                          <Badge 
+                          key={skill} 
+                          variant="default" 
+                          className="bg-blue-500/20 cursor-pointer text-blue-300 text-xs hidden-tech hidden"
+                          >
+                            {skill}
+                            </Badge>
+                          ))}
+                     </div>
+                    )}
 
                   {/* Social Links */}
                   {(userData.githubUrl || userData.linkedinUrl || userData.portfolioUrl) && (
@@ -216,19 +238,19 @@ const Dashboard = () => {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 gap-4">
-                  <Button onClick={()=>navigate('/feed/create')} variant="outline" className="border-slate-600 text-slate-700 hover:text-white hover:bg-slate-700">
+                  <Button onClick={()=>navigate('/feed/create')} variant="outline" className="border-slate-600 text-slate-700 hover:text-white hover:bg-primary">
                     <MessageSquare className="w-4 h-4 mr-2" />
                     Create Post
                   </Button>
-                  <Button onClick={()=>navigate('/projects/add')} variant="outline" className="border-slate-600 text-slate-700 hover:text-white hover:bg-slate-700">
-                    <Github className="w-4 h-4 mr-2" />
-                    Add Project
+                  <Button onClick={()=>navigate('/projects/add')} variant="outline" className="border-slate-600 text-slate-700 hover:text-white hover:bg-primary">
+                    <Code className="w-4 h-4 mr-2" />
+                    Create Project
                   </Button>
-                  <Button onClick={()=>navigate("/discover")} variant="outline" className="border-slate-600 text-slate-700 hover:text-white hover:bg-slate-700">
+                  <Button onClick={()=>navigate("/discover")} variant="outline" className="border-slate-600 text-slate-700 hover:text-white hover:bg-primary">
                     <Users className="w-4 h-4 mr-2" />
                     Find Developers
                   </Button>
-                  <Button variant="outline" className="border-slate-600 text-slate-700 hover:text-white hover:bg-slate-700">
+                  <Button variant="outline" className="border-slate-600 text-slate-700 hover:text-white hover:bg-primary">
                     <TrendingUp className="w-4 h-4 mr-2" />
                     View Analytics
                   </Button>

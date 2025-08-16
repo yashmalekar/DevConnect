@@ -5,7 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { formatDistanceToNow, set } from 'date-fns';
+import { formatDistanceToNow } from 'date-fns';
 import { useSelector } from 'react-redux';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -56,7 +56,6 @@ const Posts = () => {
     setEditingPost(post);
     setEditContent(post.content);
     setIsEditOpen(true);
-    console.log(editingPost);
     setEditTags(post.tags.join(', '));
   };
 
@@ -157,11 +156,39 @@ const Posts = () => {
                     </div>
 
                     <div className="flex flex-wrap gap-2">
-                      {post.tags.map((tag) => (
+                      {post.tags.slice(0,3).map((tag) => (
                         <Badge key={tag} variant="default" className="bg-blue-500/20 text-blue-300 text-xs cursor-pointer">
-                          {tag}
+                          #{tag}
                         </Badge>
                       ))}
+                      {post.tags.length > 3 && (
+                    <Badge 
+                      variant="default" 
+                      className="bg-blue-500/20 cursor-pointer text-blue-300 text-xs"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const techContainer = e.currentTarget.parentElement;
+                        const hiddenTechs = techContainer?.querySelectorAll('.hidden-tech');
+                        const moreButton = e.currentTarget;
+                        
+                        if (hiddenTechs) {
+                          hiddenTechs.forEach(tech => tech.classList.toggle('hidden'));
+                          moreButton.style.display = 'none';
+                        }
+                      }}
+                    >
+                      +{post.tags.length - 3} more
+                    </Badge>
+                  )}
+                  {post.tags.slice(3).map((tag) => (
+                    <Badge 
+                      key={tag} 
+                      variant="default" 
+                      className="bg-blue-500/20 cursor-pointer text-blue-300 text-xs hidden-tech hidden"
+                    >
+                      #{tag}
+                    </Badge>
+                  ))}
                     </div>
 
                     <div className="flex items-center justify-between pt-4 border-t border-slate-700">
@@ -181,7 +208,7 @@ const Posts = () => {
                             <Button 
                               size="sm" 
                               variant="secondary" 
-                              className="text-slate-700 hover:text-white hover:bg-slate-700"
+                              className="text-slate-700 hover:text-white hover:bg-primary"
                               onClick={() => handleEditPost(post)}
                             >
                               <Edit className="w-4 h-4 mr-1" />

@@ -5,6 +5,7 @@ import { Users, Github, MessageSquare, Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export const CommunityStats = () => {
+
   const stats = [
     {
       icon: Users,

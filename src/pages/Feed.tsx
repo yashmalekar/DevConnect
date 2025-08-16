@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Github, Heart, MessageSquare, Plus } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { formatDistanceToNow } from 'date-fns';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
@@ -83,12 +83,6 @@ const Feed = () => {
     setLoading(false)
   };
 
-
-    const handleAuthClick = (username:string) =>{
-      const cleanUserName = username.replace('@',"");
-      navigate(`/profile/${cleanUserName}`);
-    };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       <Header />
@@ -104,7 +98,7 @@ const Feed = () => {
 
         <div className="space-y-6">
           {posts && posts.map((post) => (
-            <Card key={post.id} className="bg-slate-800/50 border-slate-700 hover:bg-slate-800/70 transition-all duration-300">
+            <Card key={post.docId} className="bg-slate-800/50 border-slate-700 hover:bg-slate-800/70 transition-all duration-300">
               <CardHeader className="pb-3">
                 <div className="flex items-center space-x-3">
                   <Avatar className="w-12 h-12">
@@ -115,8 +109,16 @@ const Feed = () => {
                   </Avatar>
                   <div className="flex-1">
                     <div className="flex items-center space-x-2">
-                      <h3 className="font-semibold text-white">{post.author}</h3>
-                      <span className="text-slate-400 text-sm">@{post.username}</span>
+                      <h3 className="font-semibold text-white">
+                        <Link to={`/profile/${post.username}`}>
+                          {post.author}
+                        </Link>
+                      </h3>
+                      <span className="text-slate-400 text-sm">
+                        <Link to={`/profile/${post.username}`}>
+                          @{post.username}
+                        </Link>
+                      </span>
                       <span className="text-slate-500 text-sm">·</span>
                       <span className="text-slate-400 text-sm">{post.createdAt?._seconds? formatDistanceToNow(new Date(post.createdAt._seconds * 1000), { addSuffix: true }): "just now"}</span>
                     </div>
@@ -241,8 +243,36 @@ const Feed = () => {
               )}
                 
                 <div className="flex flex-wrap gap-2">
-                  {post.tags.map((tag) => (
-                    <Badge key={tag} variant="secondary" className="bg-blue-500/20 text-blue-300 text-xs cursor-pointer">
+                  {post.tags.slice(0,3).map((tag) => (
+                    <Badge key={tag} variant="default" className="bg-blue-500/20 text-blue-300 text-xs cursor-pointer">
+                      #{tag}
+                    </Badge>
+                  ))}
+                  {post.tags.length > 3 && (
+                    <Badge 
+                      variant="default" 
+                      className="bg-blue-500/20 cursor-pointer text-blue-300 text-xs"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const techContainer = e.currentTarget.parentElement;
+                        const hiddenTechs = techContainer?.querySelectorAll('.hidden-tech');
+                        const moreButton = e.currentTarget;
+                        
+                        if (hiddenTechs) {
+                          hiddenTechs.forEach(tech => tech.classList.toggle('hidden'));
+                          moreButton.style.display = 'none';
+                        }
+                      }}
+                    >
+                      +{post.tags.length - 3} more
+                    </Badge>
+                  )}
+                  {post.tags.slice(3).map((tag) => (
+                    <Badge 
+                      key={tag} 
+                      variant="default" 
+                      className="bg-blue-500/20 cursor-pointer text-blue-300 text-xs hidden-tech hidden"
+                    >
                       #{tag}
                     </Badge>
                   ))}
@@ -258,7 +288,7 @@ const Feed = () => {
                     <span className='text-slate-400 font-normal text-[15px]'>{/* {post.comments} */}28</span>
                   </Button>
                 </div>
-                </div>
+              </div>
               </CardContent>
             </Card>
           ))}

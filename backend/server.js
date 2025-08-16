@@ -20,6 +20,7 @@ app.post('/upload-profile',upload.single('image'),async(req,res)=>{
     try {
         const result = await cloudinary.uploader.upload(file.path, {
             public_id: `profiles/profile_${userId}`,
+            folder:'posts',
             overwrite: true
         });
 
@@ -118,9 +119,9 @@ app.get('/get-userData', async(req,res)=>{
 //Get Projects
 app.get('/get-projects', async(req,res)=>{
     try {
-        const data = await db.collection('projects').get();
+        const data = await db.collectionGroup('projects').get();
         if(!data.empty){
-            res.json(data.docs.map(doc =>({...doc.data()})));
+            res.json(data.docs.map(doc =>({dodId: doc.id,...doc.data()})));
         }else{
             res.json([]);
         }
@@ -134,7 +135,16 @@ app.get('/get-posts', async (req,res) => {
     const posts = db.collectionGroup('posts')
     const snapshot = await posts.get();
     const posts1 = snapshot.docs.map(doc => ({ docId: doc.id, ...doc.data() }));
-    const sortedPosts = posts1.sort((a,b)=>b.createdAt.toMillis() - a.createdAt.toMillis());
+    const sortedPosts = posts1.sort((a, b) => {
+        const getMillis = (ts) => {
+            if (!ts) return 0;
+            if (typeof ts.toMillis === 'function') return ts.toMillis();
+            if (ts instanceof Date) return ts.getTime();
+            if (typeof ts === 'string') return new Date(ts).getTime();
+            return 0;
+        };
+        return getMillis(a.createdAt) - getMillis(b.createdAt); // descending
+        });
     res.json(sortedPosts);
 })
 
@@ -208,21 +218,23 @@ app.post('/delete-post',async(req,res)=>{
 
 //Upload Post image
 app.post('/upload-post-image',upload.array('images'),async(req,res)=>{
-    const userId = req.body
+    const {userId} = req.body
     const images = req.files;
-
     try {
         const results = [];
         for(const image of images){
-            const result = await cloudinary.uploader.upload(image, {
-                public_id: `posts/image_${userId}_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
+            const result = await cloudinary.uploader.upload(image.path, {
+                public_id: `image_${userId}_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
+                folder:'posts',
                 overwrite: true
             });
             results.push({
                 url: result.secure_url,
                 public_id: result.public_id,
             });
+            fs.unlinkSync(image.path);
         }
+
         res.json({
             uploads :results,
             message: 'Image uploaded successfully'

@@ -8,6 +8,7 @@ import { Users, Github, MapPin, Star, MessageSquare } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { handleFollow } from '../../backend/utils.js';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 const SkeletonCard = ()=>{
   return (
@@ -44,6 +45,8 @@ const SkeletonCard = ()=>{
 
 const Discover = () => {
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     fetchDevelopers();
   }, []);
@@ -59,12 +62,14 @@ const Discover = () => {
     setLoading(false);
   }
   
-  const followRequest = async(devId:String, alreadyFollowing:boolean) =>{
-    const res = await handleFollow(devId,user.uid,alreadyFollowing);
-    if(res.ok){
-      fetchDevelopers();
+    const followRequest = async(devId:String, alreadyFollowing:boolean) =>{
+      if(user==null)
+        navigate('/signin');
+      const res = await handleFollow(devId,user.uid,alreadyFollowing);
+      if(res.ok){
+        fetchDevelopers();
+      }
     }
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
@@ -118,10 +123,33 @@ const Discover = () => {
                         </Badge>
                       ))}
                       {dev.skills.length > 3 && (
-                        <Badge variant="default" className="bg-blue-500/20 text-blue-300 text-xs cursor-pointer">
-                          +{dev.skills.length - 3} more
-                        </Badge>
-                      )}
+                    <Badge 
+                      variant="default" 
+                      className="bg-blue-500/20 cursor-pointer text-blue-300 text-xs"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const techContainer = e.currentTarget.parentElement;
+                        const hiddenTechs = techContainer?.querySelectorAll('.hidden-tech');
+                        const moreButton = e.currentTarget;
+                        
+                        if (hiddenTechs) {
+                          hiddenTechs.forEach(tech => tech.classList.toggle('hidden'));
+                          moreButton.style.display = 'none';
+                        }
+                      }}
+                    >
+                      +{dev.skills.length - 3} more
+                    </Badge>
+                  )}
+                  {dev.skills.slice(3).map((tech) => (
+                    <Badge 
+                      key={tech} 
+                      variant="default" 
+                      className="bg-blue-500/20 cursor-pointer text-blue-300 text-xs hidden-tech hidden"
+                    >
+                      {tech}
+                    </Badge>
+                  ))}
                     </div>
                   )}
 
@@ -140,31 +168,41 @@ const Discover = () => {
                   </div>
                 </div>
 
-                {user.uid===dev.uid ? (<></>): (
+                {(user && user.uid===dev.uid) ? (
+                  <div className='flex'>
+                    <Button variant='outline' onClick={()=>navigate(`/profile/${dev.username}`)} className='flex-1 border-slate-600 text-slate-700 hover:text-white hover:bg-primary'>
+                        View Profile
+                      </Button>
+                  </div>
+                ): (
                 <div className="space-y-2">
-                  {dev.following && !dev.followers.includes(user.uid) ? (
-                  <Button onClick={()=>followRequest(dev.uid,false)} className="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white">
-                    <Users className="w-4 h-4 mr-2" />
-                    Follow
-                  </Button>
-                  ):(
+                  {(user && (dev.following && dev.followers.includes(user.uid))) ? (
                     <div className="flex gap-2">
                       <Button onClick={()=>followRequest(dev.uid,true)} className="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white">
                         <Users className="w-4 h-4 mr-2" />
-                        UnFollow
+                        Following
                         </Button>
                         <Button 
-                          className="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white"
+                          variant="outline"
+                          className="flex-1 border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300"
                           onClick={(e) => handleMessage(e, dev.username)}
                         >
                           <MessageSquare className="w-4 h-4 mr-2" />
                           Message
                         </Button>
                     </div>
+                  ):(
+                  <Button onClick={()=>followRequest(dev.uid,false)} className="flex-1 w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white">
+                    <Users className="w-4 h-4 mr-2" />
+                    Follow
+                  </Button>
                   )}
-                  <div className="flex">
-                    <Button variant="outline" onClick={()=>window.open(dev.githubUrl,'_blank')} className="flex-1 border-slate-600 text-slate-700 hover:text-white hover:bg-slate-700">
+                  <div className="flex gap-2">
+                    <Button variant="outline" onClick={()=>window.open(dev.githubUrl,'_blank')} className="flex-1 border-slate-600 text-slate-700 hover:text-white hover:bg-primary">
                       <Github className="w-4 h-4" />
+                      </Button>
+                      <Button variant='outline' onClick={()=>navigate(`/profile/${dev.username}`)} className='flex-1 border-slate-600 text-slate-700 hover:text-white hover:bg-primary'>
+                        View Profile
                       </Button>
                   </div>
                 </div>
