@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Textarea } from '@/components/ui/textarea';
-import { ArrowLeft, Send, Heart, Github } from 'lucide-react';
+import { ArrowLeft, Send, Heart, Github, MoreVertical, Trash2 } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { formatDistanceToNow } from 'date-fns';
 import io from 'socket.io-client';
@@ -117,7 +117,7 @@ const Comments = () => {
     postData();
     
     socket.on("receiveComment",(data)=>{
-      setComments((prev)=>[...prev,data]);
+      setComments((prev)=>[data,...prev]);
     })
 
     return ()=>{
@@ -166,6 +166,14 @@ const Comments = () => {
             : comment
         )
       );
+    }
+  }
+
+  const deleteComment = async (commId:String, postId:String, postOwnerId:String)=>{
+    const res = await fetch('http://localhost:5000/delete-comment',{method:"POST",headers:{'Content-Type':'application/json'},body:JSON.stringify({commId,postId,postOwnerId})});
+    if(res.ok){
+      setComments(prevComments => prevComments.filter((comment) => comment.commId !== commId));
+      setPost(prevPost => ({ ...prevPost, comment: prevPost.comment.filter((id: string) => id !== commId) }));
     }
   }
 
@@ -406,7 +414,7 @@ const Comments = () => {
 
         {/* Comments List */}
         <div className="space-y-4">
-          {comments && comments.reverse().map((comment) => (
+          {comments && comments.map((comment) => (
             <Card key={comment.commId} className="bg-slate-800/50 border-slate-700">
               <CardContent className="pt-6">
                 <div className="flex space-x-3">
@@ -417,11 +425,16 @@ const Comments = () => {
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1">
-                    <div className="flex items-center space-x-2 mb-2">
-                      <h4 className="font-semibold text-white text-sm">{comment.author}</h4>
-                      <span className="text-slate-400 text-xs">@{comment.username}</span>
-                      <span className="text-slate-500 text-xs">·</span>
-                      <span className="text-slate-400 text-xs">{comment.createdAt?formatDistanceToNow(comment.createdAt, {addSuffix:true} ): "just now"}</span>
+                    <div className="flex justify-between">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <h4 className="font-semibold text-white text-sm">{comment.author}</h4>
+                        <span className="text-slate-400 text-xs">@{comment.username}</span>
+                        <span className="text-slate-500 text-xs">·</span>
+                        <span className="text-slate-400 text-xs">{comment.createdAt?formatDistanceToNow(comment.createdAt, {addSuffix:true} ): "just now"}</span>
+                      </div>
+                      <Button onClick={()=>deleteComment(comment.commId,comment.postId,comment.userId)} variant="ghost" size="icon" className="bg-transparent hover:text-destructive text-muted-foreground">
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
                     </div>
                     <p className="text-slate-200 text-sm leading-relaxed mb-3">{comment.content}</p>
                     <div className="flex items-center text-slate-400 space-x-4">
