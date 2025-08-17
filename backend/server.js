@@ -280,7 +280,13 @@ app.get('/get-comments',async(req,res)=>{
     try {
         const data = await db.collection('users').doc(userId).collection('posts').doc(postId).collection('comments').get();
         if(!data.empty){
-            res.json(data.docs.map(doc =>({commId: doc.id, ...doc.data()})));
+            const comments = data.docs.map(doc =>({commId: doc.id, ...doc.data()}));
+            const sortedPosts = comments.slice().sort((a, b) => {
+                const dateA = new Date(a.createdAt);
+                const dateB = new Date(b.createdAt);
+                return dateB.getTime() - dateA.getTime(); // newest → oldes
+                });
+            res.json(sortedPosts);
         }else{
             res.json({});
         }
@@ -305,5 +311,18 @@ app.post('/like-comment',async(req,res)=>{
         res.json({message:error.message});
     }
 })
+
+//Delete Comment
+app.post('/delete-comment',async(req,res)=>{
+    const {commId, postId, postOwnerId} = req.body;
+    try{
+        await db.collection('users').doc(postOwnerId).collection('posts').doc(postId).collection('comments').doc(commId).delete();
+        await db.collection('users').doc(postOwnerId).collection('posts').doc(postId).update({comment:admin.firestore.FieldValue.arrayRemove(commId)});
+        res.json({ message: 'Comment deleted successfully' });
+    }catch(error){
+        res.json({message:error.message});
+    }
+})
+
 
 server.listen(5000,()=>console.log('Server running on port 5000'));
