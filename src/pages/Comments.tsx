@@ -9,106 +9,179 @@ import { Textarea } from '@/components/ui/textarea';
 import { ArrowLeft, Send, Heart, Github } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { formatDistanceToNow } from 'date-fns';
+import io from 'socket.io-client';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { Skeleton } from '@/components/ui/skeleton';
+
+const PostLoader = ()=>{
+  return(
+    <div className='mb-4'>
+      <Card className='bg-slate-800/50 border-slate-700 hover:bg-slate-800/70'>
+        <CardHeader className='pb-3'>
+          <div className="flex items-center space-x-3">
+            <Skeleton className='w-12 h-12 rounded-full bg-slate-700' />
+            <div className="flex-1">
+              <div className="space-y-2">
+                <div className="flex items-center space-x-2">
+                  <Skeleton className='h-2 w-2/12 bg-slate-700' />
+                  <Skeleton className='h-2 w-2/12 bg-slate-700' />
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Skeleton className='h-2 w-2/12 bg-slate-700' />
+                  <Skeleton className='h-2 w-2/12 bg-slate-700' />
+                </div>
+              </div>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4 mb-3">
+            <Skeleton className='h-3 w-3/4 bg-slate-700' />
+            <Skeleton className='h-3 w-3/4 bg-slate-700' />
+            <span className='flex flex-wrap gap-2'>
+              <Skeleton className='h-3 w-10 bg-slate-700' />
+              <Skeleton className='h-3 w-10 bg-slate-700' />
+              <Skeleton className='h-3 w-10 bg-slate-700' />
+              <Skeleton className='h-3 w-10 bg-slate-700' />
+            </span>
+          </div>
+          <div className="flex items-center justify-between pt-2 border-t border-slate-700">
+            <div className="flex items-center space-x-6 text-slate-400">
+              <Skeleton className='h-5 w-5 bg-slate-700' />
+              <Skeleton className='h-5 w-5 bg-slate-700' />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
+
+const AddCommLoader = ()=>{
+  return (
+      <CardContent className='pb-3 pt-6'>
+        <div className="flex space-x-3">
+          <Skeleton className='w-12 h-12 rounded-full bg-slate-700' />
+          <div className="flex-1 flex space-x-3">
+                <Skeleton className='bg-slate-700 min-h-[75px] w-3/4' />
+                <Skeleton className='h-8 w-10 bg-slate-700 self-end' />
+          </div>
+        </div>
+      </CardContent>
+  )
+}
+
+const CommLoader = () =>{
+  return(
+    <div className='space-y-4 mb-2'>
+      <Card className='bg-slate-800/50 border-slate-700'>
+        <CardContent className='pb-3 pt-6'>
+          <div className="flex space-x-3 mb-2">
+            <Skeleton className='w-12 h-12 rounded-full bg-slate-700' />
+            <div className="flex-1">
+              <div className="flex items-center space-x-2 mb-2">
+                <Skeleton className='h-2 w-2/12 bg-slate-700' />
+                <Skeleton className='h-2 w-2/12 bg-slate-700' />
+                <Skeleton className='h-2 w-1 bg-slate-700' />
+                <Skeleton className='h-2 w-2/12 bg-slate-700' />
+              </div>
+            </div>
+          </div>
+          <Skeleton className='bg-slate-700 h-3 w-3/4 mb-2' />
+          <Skeleton className='bg-slate-700 h-3 w-3/4 mb-2' />
+          <div className='flex items-center border-t border-slate-700 space-x-2'>
+          </div>
+          <div className="space-x-2 flex">
+            <Skeleton className='h-4 w-4 bg-slate-700 mt-2' />
+            <Skeleton className='h-4 w-4 bg-slate-700 mt-2' />
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
 
 const Comments = () => {
   const location = useLocation();
   const user = useSelector((state)=>state.auth.data);
+  const socket = io('http://localhost:5000');
   const navigate = useNavigate();
   const[post,setPost] = useState<Object | null>({});
+  const [postLoading, setPostLoading] = useState(true);
+  const [commentLoading, setCommentLoading] = useState(true);
   const [newComment, setNewComment] = useState('');
-  const [comments, setComments] = useState([
-    {
-      id: 1,
-      author: 'John Doe',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face',
-      username: '@johndoe',
-      time: '2h ago',
-      content: 'Great work! This looks really useful. Can\'t wait to try it out.',
-      likes: 5,
-      liked: false
-    },
-    {
-      id: 2,
-      author: 'Jane Smith',
-      avatar: 'https://images.unsplash.com/photo-1494790108755-2616b332c2c2?w=100&h=100&fit=crop&crop=face',
-      username: '@janesmith',
-      time: '1h ago',
-      content: 'Amazing project! I love how clean the code structure is. Would love to contribute if it\'s open source.',
-      likes: 3,
-      liked: false
-    },
-    {
-      id: 3,
-      author: 'Mike Johnson',
-      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face',
-      username: '@mikej',
-      time: '45m ago',
-      content: 'This is exactly what I needed for my current project. Thanks for sharing!',
-      likes: 2,
-      liked: false
-    },
-    {
-      id: 4,
-      author: 'Sarah Wilson',
-      avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face',
-      username: '@sarahw',
-      time: '30m ago',
-      content: 'Fantastic implementation! The TypeScript integration is really well done. Could you share some insights on your testing approach?',
-      likes: 7,
-      liked: true
-    },
-    {
-      id: 5,
-      author: 'Alex Chen',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face',
-      username: '@alexc',
-      time: '15m ago',
-      content: 'This is inspiring! I\'ve been working on something similar but your approach is much more elegant.',
-      likes: 1,
-      liked: false
-    }
-  ]);
+  const [comments,setComments] = useState([]);
 
   useEffect(()=>{
     window.scrollTo(0,0);
     postData();
+    
+    socket.on("receiveComment",(data)=>{
+      setComments((prev)=>[...prev,data]);
+    })
+
+    return ()=>{
+      socket.off("receiveComment");
+    }
   },[]);
+
+  useEffect(()=>{
+    if(post && post.docId && post.uid){
+      getComments(post.docId,post.uid);
+    }
+  },[post])
 
   const postData = async ()=>{
     const data = await fetch('http://localhost:5000/get-posts',{method:"GET"}).then(res=>res.json());
-    setPost(data.filter((post1)=>post1.docId===location.pathname.slice(6))[0]);
+    const data1 = data.filter((post1)=>post1.docId===location.pathname.slice(6))[0]
+    setPost(data1);
+    setPostLoading(false);
   }
 
-  const handleCommentLike = (commentId: number) => {
-    setComments(prev => prev.map(comment => 
-      comment.id === commentId 
-        ? { 
-            ...comment, 
-            liked: !comment.liked,
-            likes: comment.liked ? comment.likes - 1 : comment.likes + 1
-          }
-        : comment
-    ));
-  };
+  const getComments = async (postId:String,postUid:String)=>{
+    const data = await fetch(`http://localhost:5000/get-comments?postId=${postId}&userId=${postUid}`,{method:'GET'});
+    const data1 = await data.json();
+    setComments(Array.isArray(data1) ? data1 : []);
+    setCommentLoading(false);
+  }
+
+  const handleCommentLike = async (userId:String,postOwnerId:String ,postId:String, commId:String, likesArray:String[])=>{
+    if(!user || !user.uid){
+      navigate('/signin');
+      return ;
+    }
+    const alreadyLiked = likesArray ? likesArray.includes(user.uid) : false;
+    const likeData = {userId, postOwnerId,  postId, commId, alreadyLiked};
+    const res = await fetch('http://localhost:5000/like-comment', {method:"POST", headers:{'Content-Type':'application/json'}, body:JSON.stringify(likeData)});
+    if(res.ok){
+      setComments(prevComments =>
+        prevComments.map(comment =>
+          comment.commId === commId
+            ? {
+                ...comment,
+                likes: alreadyLiked
+                  ? comment.likes.filter((id: string) => id !== user.uid)
+                  : (comment.likes ? [...comment.likes, user.uid] : [user.uid])
+              }
+            : comment
+        )
+      );
+    }
+  }
 
   const handleCommentSubmit = () => {
     if (!newComment.trim()) return;
 
-    const newCommentObj = {
-      id: comments.length + 1,
-      author: 'You',
-      avatar: '',
-      username: '@you',
-      time: 'now',
+    socket.emit("sendComment",{
+      userId: post.uid,
+      postId: post.docId,
+      author: user.firstName + ' ' + user.lastName,
+      avatar: user.profilePicture,
+      username: user.username,
       content: newComment,
-      likes: 0,
-      liked: false
-    };
+    });
 
-    setComments(prev => [newCommentObj, ...prev]);
     setNewComment('');
-    console.log('New comment added:', newComment);
   };
 
   return (
@@ -127,8 +200,9 @@ const Comments = () => {
           <h1 className="text-2xl font-bold text-white">Comments</h1>
         </div>
 
-        {/* Original Post */}
-        <Card className="bg-slate-800/50 border-slate-700 mb-6">
+        {postLoading ? <PostLoader />:(
+          <Card className="bg-slate-800/50 border-slate-700 mb-6">
+          {/* Original Post */}
           <CardHeader className="pb-3">
             <div className="flex items-center space-x-3">
               <Dialog>
@@ -286,13 +360,17 @@ const Comments = () => {
             </div>
             <div className="flex items-center space-x-6 mt-4 pt-4 border-t border-slate-700">
               <span className="text-slate-400 text-sm">{post.likes && post.likes.length || 0} likes</span>
-              <span className="text-slate-400 text-sm">{post.comments || 0} comments</span>
+              <span className="text-slate-400 text-sm">{post.comment && post.comment.length || 0} comments</span>
             </div>
           </CardContent>
         </Card>
+        )}
+
 
         {/* Add Comment Section */}
-        <Card className="bg-slate-800/50 border-slate-700 mb-6">
+        {user && (
+          <Card className="bg-slate-800/50 border-slate-700 mb-6">
+          {postLoading ? <AddCommLoader /> :(
           <CardContent className="pt-6">
             <div className="flex space-x-3">
               <Avatar className="w-10 h-10">
@@ -318,45 +396,51 @@ const Comments = () => {
               </div>
             </div>
           </CardContent>
-        </Card>
+          )}
+          </Card>
+        )}
+
+        {!postLoading && commentLoading && Array.from({length:3}).map((_,index)=>(
+          <CommLoader key={`skeleton-${index}`} />
+        ))}
 
         {/* Comments List */}
         <div className="space-y-4">
-          {comments.map((comment) => (
-            <Card key={comment.id} className="bg-slate-800/50 border-slate-700">
+          {comments && comments.reverse().map((comment) => (
+            <Card key={comment.commId} className="bg-slate-800/50 border-slate-700">
               <CardContent className="pt-6">
                 <div className="flex space-x-3">
                   <Avatar className="w-10 h-10">
                     <AvatarImage src={comment.avatar} alt={comment.author} />
                     <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-600 text-white text-sm">
-                      {comment.author.split(' ').map(n => n[0]).join('')}
+                      {comment.author.charAt(0)}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1">
                     <div className="flex items-center space-x-2 mb-2">
                       <h4 className="font-semibold text-white text-sm">{comment.author}</h4>
-                      <span className="text-slate-400 text-xs">{comment.username}</span>
+                      <span className="text-slate-400 text-xs">@{comment.username}</span>
                       <span className="text-slate-500 text-xs">·</span>
-                      <span className="text-slate-400 text-xs">{comment.time}</span>
+                      <span className="text-slate-400 text-xs">{comment.createdAt?formatDistanceToNow(comment.createdAt, {addSuffix:true} ): "just now"}</span>
                     </div>
                     <p className="text-slate-200 text-sm leading-relaxed mb-3">{comment.content}</p>
-                    <div className="flex items-center space-x-4">
+                    <div className="flex items-center text-slate-400 space-x-4">
                       <Button
-                        variant="ghost"
+                        variant="default"
                         size="sm"
-                        onClick={() => handleCommentLike(comment.id)}
-                        className={`text-xs ${comment.liked ? 'text-red-400 hover:text-red-300' : 'text-slate-400 hover:text-red-400'}`}
+                        onClick={() => handleCommentLike(user?user.uid:'', comment.userId, comment.postId, comment.commId, comment.likes)}
+                        className='text-slate-400 bg-transparent hover:bg-transparent hover:text-red-400'
                       >
-                        <Heart className={`w-3 h-3 mr-1 ${comment.liked ? 'fill-current' : ''}`} />
-                        {comment.likes}
+                        <Heart fill={(comment?(comment.likes && user ? comment.likes.includes(user.uid):false):false) ? 'red' : 'none' } className={`w-3 h-3 ${(comment?(comment.likes && user ? comment.likes.includes(user.uid):false):false) ? 'text-red-400' : '' }`} />
                       </Button>
-                      <Button
+                        {comment.likes && comment.likes.length || 0}
+                      {/* <Button
                         variant="ghost"
                         size="sm"
-                        className="text-xs text-slate-400 hover:text-blue-400"
+                        className="text-xs text-slate-400 hover:text-white hover:bg-primary"
                       >
                         Reply
-                      </Button>
+                      </Button> */}
                     </div>
                   </div>
                 </div>

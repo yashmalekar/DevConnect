@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { ArrowLeft, Send, Phone, Video, MoreVertical, Search, Pin, Archive, Trash2, UserX, Flag, MessageCircle, X, Plus, UserPlus } from 'lucide-react';
+import { ArrowLeft, Send, MoreVertical, Search, Trash2, MessageCircle, X, Plus, UserPlus } from 'lucide-react';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { useSelector } from 'react-redux';
 
 const Chat = () => {
   const { username } = useParams();
@@ -22,11 +22,7 @@ const Chat = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Mock user data
-  const currentUser = {
-    name: 'John Doe',
-    username: '@johndoe',
-    avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop&crop=face'
-  };
+  const currentUser = useSelector((state)=>state.auth.data);
 
   // Mock conversations data
   const conversations = [
@@ -315,9 +311,6 @@ const Chat = () => {
                         </div>
                       </DialogContent>
                     </Dialog>
-                    {conv.isOnline && (
-                      <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-background" />
-                    )}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
@@ -325,13 +318,7 @@ const Chat = () => {
                       <span className="text-xs text-muted-foreground">{conv.lastMessageTime}</span>
                     </div>
                     <p className="text-sm text-muted-foreground truncate">{conv.lastMessage}</p>
-                    <p className="text-xs text-muted-foreground">{conv.lastSeen}</p>
                   </div>
-                  {conv.unreadCount > 0 && (
-                    <Badge variant="default" className="text-xs min-w-[20px] h-5 flex items-center justify-center">
-                      {conv.unreadCount}
-                    </Badge>
-                  )}
                 </div>
               ))}
               {showNewChat && (
@@ -360,20 +347,31 @@ const Chat = () => {
                     <X className="w-4 h-4" />
                   </Button>
                   <div className="relative">
-                    <Avatar className="w-10 h-10">
-                      <AvatarImage src={selectedUser.avatar} alt={selectedUser.name} />
-                      <AvatarFallback className="bg-primary text-primary-foreground">
-                        {selectedUser.name.split(' ').map(n => n[0]).join('')}
-                      </AvatarFallback>
-                    </Avatar>
-                    {selectedUser.isOnline && (
-                      <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-background" />
-                    )}
+                    <Dialog>
+                      <DialogTrigger className='cursor-pointer  ' asChild>
+                        <Avatar className="w-10 h-10">
+                          <AvatarImage src={selectedUser.avatar} alt={selectedUser.name} />
+                          <AvatarFallback className="bg-primary text-primary-foreground">
+                            {selectedUser.name.split(' ').map(n => n[0]).join('')}
+                          </AvatarFallback>
+                        </Avatar>
+                      </DialogTrigger>
+                      <DialogContent className='max-w-md p-0 border-0 bg-transparent'>
+                        <div className="relative">
+                          <img
+                          src={selectedUser.avatar}
+                          alt="Profile Image"
+                          className="w-full h-auto max-h-[80vh] object-contain rounded-lg"
+                          />
+                        </div>
+                      </DialogContent>
+                    </Dialog>
                   </div>
                   <div>
-                    <h3 className="font-semibold text-foreground">{selectedUser.name}</h3>
-                    <p className="text-sm text-muted-foreground">{selectedUser.username}</p>
-                    <p className="text-xs text-green-500">{selectedUser.lastSeen}</p>
+                    <Link to={`/profile/${selectedUser.id}`}>
+                      <h3 className="font-semibold text-foreground">{selectedUser.name}</h3>
+                    </Link>
+                      <p className="text-sm text-muted-foreground">{selectedUser.username}</p>
                   </div>
                 </div>
                 <div className="flex items-center space-x-2">

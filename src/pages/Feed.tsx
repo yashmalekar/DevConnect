@@ -9,15 +9,57 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { formatDistanceToNow } from 'date-fns';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { Skeleton } from '@/components/ui/skeleton';
+
+ const SkeletonCard = ()=>{
+  return(
+    <div className='mb-4'>
+      <Card className='bg-slate-800/50 border-slate-700 hover:bg-slate-800/70'>
+        <CardHeader className='pb-3'>
+          <div className="flex items-center space-x-3">
+            <Skeleton className='w-12 h-12 rounded-full bg-slate-700' />
+            <div className="flex-1">
+              <div className="space-y-2">
+                <div className="flex items-center space-x-2">
+                  <Skeleton className='h-2 w-2/12 bg-slate-700' />
+                  <Skeleton className='h-2 w-2/12 bg-slate-700' />
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Skeleton className='h-2 w-2/12 bg-slate-700' />
+                  <Skeleton className='h-2 w-2/12 bg-slate-700' />
+                </div>
+              </div>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4 mb-3">
+            <Skeleton className='h-3 w-3/4 bg-slate-700' />
+            <Skeleton className='h-3 w-3/4 bg-slate-700' />
+            <span className='flex flex-wrap gap-2'>
+              <Skeleton className='h-3 w-10 bg-slate-700' />
+              <Skeleton className='h-3 w-10 bg-slate-700' />
+              <Skeleton className='h-3 w-10 bg-slate-700' />
+              <Skeleton className='h-3 w-10 bg-slate-700' />
+            </span>
+          </div>
+          <div className="flex items-center justify-between pt-2 border-t border-slate-700">
+            <div className="flex items-center space-x-6 text-slate-400">
+              <Skeleton className='h-5 w-5 bg-slate-700' />
+              <Skeleton className='h-5 w-5 bg-slate-700' />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
 
 const Feed = () => {
 
   const navigate = useNavigate();
   const user = useSelector((state)=>state.auth.user);
-  
-  const [lastDoc, setLastDoc] = useState(null);
-  const [hasMore, setHasMore] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [posts, setPosts] = useState([]);
 
   
@@ -25,19 +67,6 @@ const Feed = () => {
     window.scrollTo(0,0);
     getPost();
   }, [])
-  
-//   const loadMorePosts = async () => {
-//     if (!lastDoc) return;
-    
-//     setLoading(true);
-//     const { posts: newPosts, lastVisible: newLastDoc } = await getPosts(5, lastDoc);
-
-//     setPosts(prev => [...prev, ...newPosts]);
-//     setLastDoc(newLastDoc);
-//     setHasMore(newPosts.length === 5);
-//     setLoading(false);
-// };
-
 
   const handlePost = ()=>{
     const isAuthenticated = user;
@@ -73,13 +102,9 @@ const Feed = () => {
 
   
   const getPost = async () => {
-    setLoading(true);
-    // const { posts: fetchedPosts, lastVisible } = await getPosts(5);
     const data = await fetch('http://localhost:5000/get-posts',{method:"GET"});
     const posts1 = await data.json();
     setPosts(posts1);
-    // setLastDoc(lastVisible);
-    // setHasMore(fetchedPosts.length === 5);
     setLoading(false)
   };
 
@@ -95,6 +120,10 @@ const Feed = () => {
             Create Post
           </Button>
         </div>
+
+        {loading && Array.from({length:4}).map((_,index)=>(
+            <SkeletonCard key={`skeleton-${index}`} />
+        ))}
 
         <div className="space-y-6">
           {posts && posts.map((post) => (
@@ -282,28 +311,17 @@ const Feed = () => {
                   <Button onClick={()=>handleLike(post.docId,post.uid,post.likes)} variant="default" size="sm" className="text-slate-400 bg-transparent hover:bg-transparent hover:text-red-400">
                     <Heart fill={`${(posts?(post.likes && user ? post.likes.includes(user.uid) : false):false) ? 'red' : 'none'}`} className={`w-4 h-4 ${(posts?(post.likes && user? post.likes.includes(user.uid) : false):false) ? 'text-red-700': ''}`} />
                   </Button>
-                    {post.likes? post.likes.length : 0}
+                    {post.likes && post.likes.length || 0}
                   <Button onClick={()=>navigate(`/post/${post.docId}`)} variant="default" size="sm" className="text-slate-400 bg-transparent hover:bg-transparent hover:text-blue-400">
                     <MessageSquare className="w-4 h-4 mr-1" />
-                    <span className='text-slate-400 font-normal text-[15px]'>{/* {post.comments} */}28</span>
+                    <span className='text-slate-400 font-normal text-[15px]'>{post.comment && post.comment.length || 0}</span>
                   </Button>
                 </div>
               </div>
               </CardContent>
             </Card>
           ))}
-          {/* {posts.length === 0 && !loading && (
-            <div className="text-white text-center text-2xl">No Posts Found</div>
-            )} */}
-        </div>
-{/* 
-        {hasMore &&
-        <div className="text-center mt-8">
-          <Button variant="outline" size="lg" disabled={loading} onClick={loadMorePosts} className="border-slate-600 text-slate-700 hover:text-white hover:bg-slate-800">
-            {loading ? 'Loading...' :'Load More Posts'}
-          </Button>
-        </div>
-        } */}
+          </div>
       </div>
     </div>
   );

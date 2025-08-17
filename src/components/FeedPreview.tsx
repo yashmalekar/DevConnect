@@ -210,7 +210,7 @@ export const FeedPreview = () => {
                     {post.likes? post.likes.length : 0}
                   <Button size='sm' variant='default' className="text-slate-400 bg-transparent hover:bg-transparent hover:text-blue-400">
                     <MessageSquare className="w-4 h-4 mr-1" />
-                    <span className='text-slate-400 font-normal text-[15px]'>{/* {post.comments} */}28</span>
+                    <span className='text-slate-400 font-normal text-[15px]'>{post.comment ? post.comment.length : 0}</span>
                   </Button>
                 </div>
               </div>

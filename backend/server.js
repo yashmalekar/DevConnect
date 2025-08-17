@@ -4,13 +4,34 @@ import multer from "multer";
 import fs from 'fs';
 import cors from 'cors';
 import { admin, db } from './firebase.js'
+import { createServer } from "http";
+import { Server } from "socket.io";
+import { v4 as uuidv4 } from 'uuid';
 
 const app = express();
+const server = createServer(app);
+const io = new Server(server,{
+    cors:{origin:'*'}
+});
 const upload = multer({dest: 'uploads/'});
 
 app.use(cors());    
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+io.on("connection",(socket)=>{
+    socket.on("sendComment",async(data)=>{
+        const {author,avatar,username,content,userId,postId} = data;
+        const createdAt = Date.now();
+        const commentObj = {author,avatar, username, content, userId, postId, createdAt};
+        const commRef = await db.collection('users').doc(userId).collection('posts').doc(postId).collection('comments').add(commentObj);
+        await db.collection('users').doc(userId).collection('posts').doc(postId).update({comment:admin.firestore.FieldValue.arrayUnion(commRef.id)});
+        
+        io.emit("receiveComment",{
+            commId: commRef.id,author,avatar,username,createdAt,content, likes:[], userId, postId
+        });
+    });
+});
 
 //Upload-profileImage
 app.post('/upload-profile',upload.single('image'),async(req,res)=>{
@@ -134,17 +155,12 @@ app.get('/get-projects', async(req,res)=>{
 app.get('/get-posts', async (req,res) => {
     const posts = db.collectionGroup('posts')
     const snapshot = await posts.get();
-    const posts1 = snapshot.docs.map(doc => ({ docId: doc.id, ...doc.data() }));
-    const sortedPosts = posts1.sort((a, b) => {
-        const getMillis = (ts) => {
-            if (!ts) return 0;
-            if (typeof ts.toMillis === 'function') return ts.toMillis();
-            if (ts instanceof Date) return ts.getTime();
-            if (typeof ts === 'string') return new Date(ts).getTime();
-            return 0;
-        };
-        return getMillis(a.createdAt) - getMillis(b.createdAt); // descending
-        });
+    const posts1 = snapshot.docs.map(doc => ({ docId: doc.id, ...doc.data() }))
+    const sortedPosts = posts1.slice().sort((a, b) => {
+        const dateA = new Date(a.createdAt._seconds * 1000 + a.createdAt._nanoseconds / 1e6);
+        const dateB = new Date(b.createdAt._seconds * 1000 + b.createdAt._nanoseconds / 1e6);
+        return dateB.getTime() - dateA.getTime(); // newest → oldest
+});
     res.json(sortedPosts);
 })
 
@@ -258,4 +274,36 @@ app.post('/delete-post-image',async(req,res)=>{
     }
 })
 
-app.listen(5000,()=>console.log('Server running on port 5000'));
+//Get-commments
+app.get('/get-comments',async(req,res)=>{
+    const { postId, userId } = req.query;
+    try {
+        const data = await db.collection('users').doc(userId).collection('posts').doc(postId).collection('comments').get();
+        if(!data.empty){
+            res.json(data.docs.map(doc =>({commId: doc.id, ...doc.data()})));
+        }else{
+            res.json({});
+        }
+    } catch (error) {
+        console.error(error);
+    }
+})
+
+//Like Comment
+app.post('/like-comment',async(req,res)=>{
+    const { userId, postOwnerId, postId, commId, alreadyLiked} = req.body;
+    try {
+        const commentRef = db.collection('users').doc(postOwnerId).collection('posts').doc(postId).collection('comments').doc(commId);
+        if(alreadyLiked){
+            await commentRef.update({likes: admin.firestore.FieldValue.arrayRemove(userId)});
+            res.json({ message: 'Comment unliked successfully' });
+        }else{
+            await commentRef.update({likes: admin.firestore.FieldValue.arrayUnion(userId)});
+            res.json({ message: 'Comment liked successfully' });
+        }
+    } catch (error) {
+        res.json({message:error.message});
+    }
+})
+
+server.listen(5000,()=>console.log('Server running on port 5000'));
