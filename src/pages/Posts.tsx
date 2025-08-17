@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Heart, MessageSquare, Calendar, Edit, Trash2 } from 'lucide-react';
+import { ArrowLeft, Heart, MessageSquare, Calendar, Edit, Trash2, Image, X } from 'lucide-react';
 
 const Posts = () => {
   const navigate = useNavigate();
@@ -203,7 +203,7 @@ const Posts = () => {
                                 </Button>
                         </div>
                       <div className="flex gap-2">
-                        <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+                        <Dialog  open={isEditOpen} onOpenChange={setIsEditOpen}>
                           <DialogTrigger asChild>
                             <Button 
                               size="sm" 
@@ -242,6 +242,32 @@ const Posts = () => {
                                   placeholder="React, JavaScript, Web Development"
                                 />
                               </div>
+                              <Label className="text-slate-300">Images</Label>
+                              <div className="flex items-center space-x-2">
+                                <Input accept='image/*' type='file' id='Images' className='hidden' multiple  onChange={(e)=>{
+                                  const files = e.target.files;
+                                  if(files){
+                                    // setImageFiles(Array.from(files));
+                                    }
+                                }} />
+                                <Button
+                                type="button"
+                                variant="outline"
+                                className="border-slate-600 text-slate-700 hover:text-white hover:bg-slate-700"
+                                onClick={() => document.getElementById('Images')?.click()}
+                                >
+                                  <Image className="w-4 h-4 mr-2" />
+                                  Add Image
+                                  </Button>
+                              </div>
+                              {editingPost &&  editingPost.images.map((image,index)=>(
+                                <div className="flex justify-between items-center gap-2 p-2 bg-slate-700 rounded" key={index}>
+                                  <img src={image} alt={index} className='w-12 h-12 object-cover rounded' />
+                                  <Button size='sm' variant='outline' className='border-red-600 text-red-400 hover:bg-red-600 hover:text-white'>
+                                    <X className='w-4 h-4 cursor-pointer' />
+                                  </Button>
+                                </div>
+                              ))}
                             </div>
                             <DialogFooter>
                               <Button 

@@ -432,9 +432,11 @@ const Comments = () => {
                         <span className="text-slate-500 text-xs">·</span>
                         <span className="text-slate-400 text-xs">{comment.createdAt?formatDistanceToNow(comment.createdAt, {addSuffix:true} ): "just now"}</span>
                       </div>
-                      <Button onClick={()=>deleteComment(comment.commId,comment.postId,comment.userId)} variant="ghost" size="icon" className="bg-transparent hover:text-destructive text-muted-foreground">
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+                      {user && (
+                        <Button onClick={()=>deleteComment(comment.commId,comment.postId,comment.userId)} variant="ghost" size="icon" className="bg-transparent hover:text-destructive text-muted-foreground">
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      )}
                     </div>
                     <p className="text-slate-200 text-sm leading-relaxed mb-3">{comment.content}</p>
                     <div className="flex items-center text-slate-400 space-x-4">
