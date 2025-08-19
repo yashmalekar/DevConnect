@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Textarea } from '@/components/ui/textarea';
-import { ArrowLeft, Send, Heart, Github, MoreVertical, Trash2 } from 'lucide-react';
+import { ArrowLeft, Send, Heart, Github, Trash2 } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { formatDistanceToNow } from 'date-fns';
 import io from 'socket.io-client';

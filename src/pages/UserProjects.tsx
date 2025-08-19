@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Github, ExternalLink, Code} from 'lucide-react';
+import { useSelector } from 'react-redux';
 
 const UserProjects = () => {
   const navigate = useNavigate();
@@ -15,9 +16,12 @@ const UserProjects = () => {
     }, [])
   
     const [projects, setProjects] = useState([]);
+    const user = useSelector((state) => state.auth.data);
   
     const getProject = async ()=>{
-      setProjects(await fetch('http://localhost:5000/get-projects').then(res=>res.json())); 
+      const data = await fetch('http://localhost:5000/get-projects').then(res=>res.json());
+      const projects1 = data.filter((project)=>project.uid===user.uid);
+      setProjects(projects1); 
     }
 
   return (

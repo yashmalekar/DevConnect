@@ -185,7 +185,7 @@ const Profile = () => {
                 
                 {/* Action Buttons */}
                 <div className="flex flex-col gap-3 w-full max-w-sm">
-                  {(currentUser && (user.followers && !user.followers.includes(currentUser.uid)) )? (
+                  {(currentUser && (user.followers && user.followers.includes(currentUser.uid)) )? (
                     <>
                   <Button 
                     onClick={()=>followRequest(currentUser.uid,true)}
