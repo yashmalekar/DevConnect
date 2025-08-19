@@ -37,18 +37,18 @@ const Posts = () => {
     const likeData = { postId:docId, postOwnerId, userId:user.uid, liked: alreadyLiked };
     const res = await fetch('http://localhost:5000/like-post', { method:'POST',headers:{'Content-Type':'application/json'},body: JSON.stringify(likeData)});
     if(res.ok){
-          setPosts(prevPosts =>
-      prevPosts.map(post =>
-        post.docId === docId
+      setPosts(prevPosts =>
+        prevPosts.map(post =>
+          post.docId === docId
           ? {
-              ...post,
-              likes: alreadyLiked
-                ? post.likes.filter((id: string) => id !== user.uid)
-                : [...post.likes, user.uid]
-            }
+            ...post,
+            likes: alreadyLiked
+            ? post.likes.filter((id: string) => id !== user.uid)
+            : [...post.likes, user.uid]
+          }
           : post
-      )
-    );
+        )
+      );
     }
   }
 
@@ -81,10 +81,10 @@ const Posts = () => {
     });
   };
 
-  const handleDeletePost = async (postId) => {
+  const handleDeletePost = async (postId:String, imageUrls:String[]) => {
     const updatedPosts = posts.filter(post => post.docId !== postId);
     setPosts(updatedPosts);
-    await fetch("http://localhost:5000/delete-post",{method:"POST", headers:{"Content-Type":"application/json"},body:JSON.stringify({docId:postId, uid: user.uid})});
+    await fetch("http://localhost:5000/delete-post",{method:"POST", headers:{"Content-Type":"application/json"},body:JSON.stringify({docId:postId, uid: user.uid, imageUrls})});
     toast({
       title: "Post deleted",
       description: "Your post has been successfully deleted.",
@@ -199,7 +199,7 @@ const Posts = () => {
                             {post.likes? post.likes.length : 0}
                             <Button onClick={()=>navigate(`/post/${post.docId}`)} variant="default" size="sm" className="text-slate-400 bg-transparent hover:bg-transparent hover:text-blue-400">
                                 <MessageSquare className="w-4 h-4 mr-1" />
-                                <span className='text-slate-400 font-normal text-[15px]'>{/* {post.comments} */}28</span>
+                                <span className='text-slate-400 font-normal text-[15px]'>{post.comments && post.comments.length || 0}</span>
                                 </Button>
                         </div>
                       <div className="flex gap-2">
@@ -307,7 +307,7 @@ const Posts = () => {
                               <DialogTrigger asChild>
                                 <Button 
                                   variant="destructive"
-                                  onClick={() => handleDeletePost(post.docId)}
+                                  onClick={() => handleDeletePost(post.docId,post.images)}
                                   className="bg-red-600 hover:bg-red-700"
                                 >
                                   Delete
@@ -320,15 +320,15 @@ const Posts = () => {
                     </div>
                   </div>
 
-                  {post.images && post.images.length > 0 && (
-                    <div className="w-32 h-24 flex-shrink-0">
-                      <img
-                        src={post.images[0]}
-                        alt="Post Image"
-                        className="w-full h-full object-cover rounded-lg"
-                      />
-                    </div>
-                  )}
+              {post.images && post.images.length > 0 && (
+                <div className="w-32 h-24 flex-shrink-0">
+                  <img
+                    src={post.images[0]}
+                    alt="Post Image"
+                    className="w-full h-full object-cover rounded-lg"
+                  />
+                </div>
+              )}
                 </div>
               </CardContent>
             </Card>

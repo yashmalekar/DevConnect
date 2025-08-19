@@ -6,7 +6,7 @@ import cors from 'cors';
 import { admin, db } from './firebase.js'
 import { createServer } from "http";
 import { Server } from "socket.io";
-import { v4 as uuidv4 } from 'uuid';
+import { extractPublicId } from 'cloudinary-build-url';
 
 const app = express();
 const server = createServer(app);
@@ -222,10 +222,12 @@ app.post('/edit-post',async(req,res)=>{
 
 //Delete Post
 app.post('/delete-post',async(req,res)=>{
-    const { docId, uid } = req.body;
+    const { docId, uid, imageUrls } = req.body;
     try {
         await db.collection('users').doc(uid).collection('posts').doc(docId).delete();
         await db.collection('users').doc(uid).update({posts: admin.firestore.FieldValue.arrayRemove(docId)});
+        const public_ids = imageUrls.map((img)=>{return extractPublicId(img)});
+        cloudinary.uploader.destroy(public_ids); 
         res.json({ message: 'Post deleted successfully' });
     } catch (error) {
         res.json({message:error.message});
