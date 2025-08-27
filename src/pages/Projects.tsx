@@ -97,7 +97,7 @@ const Projects = () => {
                   {project.tech.length > 3 && (
                     <Badge 
                       variant="default" 
-                      className="bg-purple-500/20 cursor-pointer text-purple-300 hover:bg-purple-500/30 cursor-pointer text-xs"
+                      className="bg-purple-500/20 text-purple-300 hover:bg-purple-500/30 cursor-pointer text-xs"
                       onClick={(e) => {
                         e.stopPropagation();
                         const techContainer = e.currentTarget.parentElement;
