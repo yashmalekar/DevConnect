@@ -21,14 +21,14 @@ app.use(express.urlencoded({ extended: true }));
 
 io.on("connection",(socket)=>{
     socket.on("sendComment",async(data)=>{
-        const {author,avatar,username,content,userId,postId} = data;
+        const {author,avatar,username,content,userId,authorId,postId} = data;
         const createdAt = Date.now();
-        const commentObj = {author,avatar, username, content, userId, postId, createdAt};
+        const commentObj = {author,avatar, username, content, userId,authorId, postId, createdAt};
         const commRef = await db.collection('users').doc(userId).collection('posts').doc(postId).collection('comments').add(commentObj);
         await db.collection('users').doc(userId).collection('posts').doc(postId).update({comment:admin.firestore.FieldValue.arrayUnion(commRef.id)});
         
         io.emit("receiveComment",{
-            commId: commRef.id,author,avatar,username,createdAt,content, likes:[], userId, postId
+            commId: commRef.id,author,avatar,username,createdAt,content, likes:[], userId, postId, authorId
         });
     });
 });
@@ -108,7 +108,7 @@ app.post('/create-project',async(req,res)=>{
     }
 })
 
-//Get Users
+//Get All Users
 app.get('/get-users', async(req,res)=>{
     try {
         const data = await db.collection('users').get();
@@ -324,6 +324,46 @@ app.post('/delete-comment',async(req,res)=>{
     }catch(error){
         res.json({message:error.message});
     }
+})
+
+//Delete User References after deleting account
+app.post('/delete-user-references', async(req,res)=>{
+    const { uid } = req.body;
+    const userSnapShot = await db.collection('users').get();
+    const bulkWriter = db.bulkWriter();
+    for (const doc of userSnapShot.docs){
+        const userRef = doc.ref;
+        const data = doc.data();
+        if(data.followers?.includes(uid)){
+            bulkWriter.update(userRef,{
+                followers: admin.firestore.FieldValue.arrayRemove(uid)
+            });
+        }
+        if(data.following?.includes(uid)){
+            bulkWriter.update(userRef,{
+                following: admin.firestore.FieldValue.arrayRemove(uid)
+            });
+        }
+        if(data.likes?.includes(uid)){
+            bulkWriter.update(userRef,{
+                likes: admin.firestore.FieldValue.arrayRemove(uid)
+            })
+        }
+        const postSnapShot = await userRef.collection('posts').get();
+            for(const postDoc of postSnapShot.docs){
+            const commentRef = postDoc.ref.collection('comments');
+            const commentSnapShots = await commentRef.where('authorId','==',uid).get();
+            for(const commentDoc of commentSnapShots.docs){
+                bulkWriter.update(postDoc.ref,{comment: admin.firestore.FieldValue.arrayRemove(commentDoc.id)});
+                bulkWriter.delete(commentDoc.ref);
+            }
+        }
+    }
+    await bulkWriter.close().then(()=>{
+        res.json({ message: 'User references deleted successfully' });
+    }).catch((error)=>{
+        res.json({message:error.message});
+    })
 })
 
 

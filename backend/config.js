@@ -181,7 +181,11 @@ const deleteUserAuth = async (user,password=null)=>{
     }else if(providerId === 'github.com'){
       await reauthenticateWithPopup(user, githubProvider);
     }
-    await deleteUser(user);
+    const res = await fetch('http://localhost:5000/delete-user-references',{headers:{'Content-Type':'application/json'},body:JSON.stringify({uid:user.uid}),method:'POST'});
+    if(res.ok)
+      await deleteUser(user);
+    else
+      throw new Error("Error deleting user references");
     toast({
       title: "User Deleted Successfully",
       description: "The user account has been permanently removed from the system.",
