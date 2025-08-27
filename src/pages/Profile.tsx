@@ -114,6 +114,7 @@ const Profile = () => {
   const navigate = useNavigate();
   const currentUser = useSelector((state)=> state.auth.data);
   const [user, setUser] = useState<any>([]);
+  const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const getData = async () =>{
@@ -121,11 +122,20 @@ const Profile = () => {
     setUser(userData);
     setLoading(false);
   }
+  const getProject = async ()=>{
+    const data = await fetch('http://localhost:5000/get-projects').then(res=>res.json());
+    const projects1 = data.filter((project)=>project.uid===user.uid);
+    setProjects(projects1); 
+  }
 
   useEffect(() => {
     window.scrollTo(0,0);
     getData();
   }, [])
+
+  useEffect(()=>{
+    getProject();
+  },[projects]);
 
   const stats = [
     { label: 'Followers', value: user.followers ? user.followers.length : 0, icon: Users, color: 'text-blue-400' },
@@ -321,36 +331,26 @@ const Profile = () => {
             </TabsTrigger>
           </TabsList>
 
-          {/* <TabsContent value="projects">
+          <TabsContent value="projects">
             <div className="grid gap-6">
-              {user.projects && user.projects.length > 0 ? (
-                user.projects.map((project: any, index: number) => (
+              {projects && projects.length > 0 ? (
+                projects.map((project: any, index: number) => (
                   <Card key={index} className="bg-slate-800/50 border-slate-700 hover:bg-slate-800/70 transition-colors">
                     <CardContent className="p-6">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
                           <div className="flex items-center space-x-2 mb-2">
                             <BookOpen className="w-5 h-5 text-blue-400" />
-                            <h3 className="text-xl font-semibold text-white">{project.name}</h3>
+                            <h3 className="text-xl font-semibold text-white">{project.title}</h3>
                           </div>
                           <p className="text-slate-300 mb-4">{project.description}</p>
-                          <div className="flex flex-wrap gap-2 mb-4">
+                          <div className="flex flex-wrap gap-2">
                             {project.tech.map((tech: string, techIndex: number) => (
                               <Badge key={techIndex} variant="default" className="cursor-pointer bg-purple-500/20 text-purple-300 hover:bg-purple-500/30 text-xs">
                                 {tech}
                               </Badge>
                             ))}
                           </div>
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-6 text-slate-400">
-                        <div className="flex items-center space-x-1">
-                          <Star className="w-4 h-4" />
-                          <span>{project.stars}</span>
-                        </div>
-                        <div className="flex items-center space-x-1">
-                          <GitFork className="w-4 h-4" />
-                          <span>{project.forks}</span>
                         </div>
                       </div>
                     </CardContent>
@@ -365,7 +365,7 @@ const Profile = () => {
                 </Card>
               )}
             </div>
-          </TabsContent> */}
+          </TabsContent>
 
           <TabsContent value="activity">
             <Card className="bg-slate-800/50 border-slate-700">
