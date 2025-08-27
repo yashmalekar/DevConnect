@@ -9,9 +9,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { ArrowLeft, Send, Heart, Github, Trash2 } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { formatDistanceToNow } from 'date-fns';
-import io from 'socket.io-client';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
+import io from 'socket.io-client';
 
 const PostLoader = ()=>{
   return(
@@ -183,6 +183,7 @@ const Comments = () => {
     socket.emit("sendComment",{
       userId: post.uid,
       postId: post.docId,
+      authorId: user.uid,
       author: user.firstName + ' ' + user.lastName,
       avatar: user.profilePicture,
       username: user.username,
@@ -432,7 +433,7 @@ const Comments = () => {
                         <span className="text-slate-500 text-xs">·</span>
                         <span className="text-slate-400 text-xs">{comment.createdAt?formatDistanceToNow(comment.createdAt, {addSuffix:true} ): "just now"}</span>
                       </div>
-                      {user && (
+                      {(user && user.uid === comment.authorId) && (
                         <Button onClick={()=>deleteComment(comment.commId,comment.postId,comment.userId)} variant="ghost" size="icon" className="bg-transparent hover:text-destructive text-muted-foreground">
                           <Trash2 className="w-4 h-4" />
                         </Button>

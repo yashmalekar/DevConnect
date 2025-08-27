@@ -90,14 +90,14 @@ const Projects = () => {
               <CardContent className="space-y-4">
                 <div className="flex flex-wrap gap-2">
                   {project.tech.slice(0,3).map((tech) => (
-                    <Badge key={tech} variant="secondary" className="bg-purple-500/20 text-purple-300 hover:bg-purple-500/30 text-xs">
+                    <Badge key={tech} variant="secondary" className="cursor-pointer bg-purple-500/20 text-purple-300 hover:bg-purple-500/30 text-xs">
                       {tech}
                     </Badge>
                   ))}
                   {project.tech.length > 3 && (
                     <Badge 
                       variant="default" 
-                      className="bg-purple-500/20 text-purple-300 hover:bg-purple-500/30 cursor-pointer text-xs"
+                      className="bg-purple-500/20 cursor-pointer text-purple-300 hover:bg-purple-500/30 cursor-pointer text-xs"
                       onClick={(e) => {
                         e.stopPropagation();
                         const techContainer = e.currentTarget.parentElement;

@@ -71,7 +71,7 @@ export const Header = () => {
             {user ? (
               <>
                 <Link to="/chat">
-                  <Button variant="ghost" size="icon" className="text-slate-300 hover:text-white">
+                  <Button variant="ghost" size="icon" className="text-slate-300 hover:text-slate-700">
                     <MessageSquare className="w-4 h-4" />
                   </Button>
                 </Link>
