@@ -17,7 +17,7 @@ const AddProject = () => {
   useEffect(() => {
     if(!data)
       navigate('/signin');
-  }, [])
+  }, [data])
   
   const [projectData, setProjectData] = useState({
     uid: data.uid,
@@ -197,7 +197,7 @@ const AddProject = () => {
               <div className="flex space-x-4 pt-6">
                 <Button
                   type="submit"
-                  className="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white"
+                  className="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 active:from-blue-600 active:to-purple-700 text-white"
                 >
                   <Github className="w-4 h-4 mr-2" />
                   Create Project

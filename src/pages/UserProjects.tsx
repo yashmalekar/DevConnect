@@ -9,15 +9,17 @@ import { useSelector } from 'react-redux';
 
 const UserProjects = () => {
   const navigate = useNavigate();
+  const user = useSelector((state) => state.auth.data);
 
     useEffect(() => {
+      if(!user)
+        navigate('/signin')
       getProject();
       window.scrollTo(0,0);
-    }, [])
+    }, [user])
   
     const [projects, setProjects] = useState([]);
-    const user = useSelector((state) => state.auth.data);
-  
+    
     const getProject = async ()=>{
       const data = await fetch('http://localhost:5000/get-projects').then(res=>res.json());
       const projects1 = data.filter((project)=>project.uid===user.uid);
@@ -45,7 +47,7 @@ const UserProjects = () => {
             </div>
           </div>
           <Button 
-            className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
+            className="bg-gradient-to-r from-blue-500 to-purple-600 active:from-blue-600 active:to-purple-700"
             onClick={() => navigate('/projects/add')}
           >
             <Code className="w-4 h-4 mr-2" />
@@ -136,7 +138,7 @@ const UserProjects = () => {
                   {project.demoUrl && (
                     <Button
                       size="sm"
-                      className="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
+                      className="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 active:from-blue-600 active:to-purple-700"
                       onClick={() => window.open(project.demoUrl, '_blank')}
                     >
                       <ExternalLink className="w-4 h-4 mr-1" />
@@ -154,7 +156,7 @@ const UserProjects = () => {
             <div className="text-slate-400 text-6xl mb-4">🚀</div>
             <h3 className="text-xl font-semibold text-white mb-2">No projects found</h3>
             <Button 
-              className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
+              className="bg-gradient-to-r from-blue-500 to-purple-600 active:from-blue-600 active:to-purple-700"
               onClick={() => navigate('/projects/add')}
             >
               Create Your First Project

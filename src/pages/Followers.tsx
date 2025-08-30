@@ -15,9 +15,11 @@ const Followers = () => {
   const currentUser = useSelector((state)=>state.auth.user);
   const [followers,setFollowers] = useState([]);
   useEffect(() => {
+    if(!currentUser)
+      navigate('/signin')
     window.scrollTo(0, 0);
     setFollowersData();
-  }, [])
+  }, [currentUser])
 
   const setFollowersData = async()=>{
     const followersData = await fetch('http://localhost:5000/get-users').then(res=>res.json());
@@ -56,7 +58,7 @@ const Followers = () => {
                 onClick={() => followRequest(user.uid,user.isFollowing)}
                 className={user.isFollowing 
                   ? "border-slate-600 text-slate-700 hover:bg-red-500 hover:text-white hover:border-red-500" 
-                  : "bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
+                  : "bg-gradient-to-r from-blue-500 to-purple-600 active:from-blue-600 active:to-purple-700"
                 }
               >
                 {user.isFollowing ? (

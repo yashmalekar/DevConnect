@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Github, Mail, Lock, ArrowLeft, Eye, EyeClosed } from 'lucide-react';
 import { handleGithubLogin, handleEmailLogin, handleGoogleAuthLogin } from '../../backend/config.js'
 import { useToast } from '@/hooks/use-toast.js';
+import { useSelector } from 'react-redux';
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
@@ -14,6 +15,13 @@ const SignIn = () => {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const user = useSelector((state)=>state.auth.user);
+
+  useEffect(() => {
+    if(user)
+      navigate('/dashboard');
+  }, [user])
+  
 
   const handleSignIn = async (e: React.FormEvent)=>{
     e.preventDefault();
@@ -108,7 +116,7 @@ const SignIn = () => {
                 </div>
               </div>
 
-              <Button type="submit" className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white">
+              <Button type="submit" className="w-full bg-gradient-to-r from-blue-500 to-purple-600 active:from-blue-600 active:to-purple-700 text-white">
                 Sign In
               </Button>
             </form>

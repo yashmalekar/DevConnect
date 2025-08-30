@@ -137,14 +137,22 @@ const Projects = () => {
                 </div>
 
                 <div className="flex space-x-2 pt-2">
-                  <Button className="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-slate-900">
+                  {project.demoUrl &&(
+                  <Button className="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 active:from-blue-600 active:to-purple-700 text-slate-900">
                     <ExternalLink className="w-4 h-4 mr-2" />
-                    View Demo
+                    <a target='_blank' href={project.demoUrl}>
+                      View Demo
+                    </a>
                   </Button>
+                  )}
+                  {project.githubUrl && (
                   <Button variant="outline" className="border-slate-600 text-slate-700 hover:text-white hover:bg-primary">
                     <Github className="w-4 h-4 mr-2" />
-                    Code
+                    <a target='_blank' href={project.githubUrl}>
+                      Code
+                    </a>
                   </Button>
+                  )}
                 </div>
               </CardContent>
             </Card>

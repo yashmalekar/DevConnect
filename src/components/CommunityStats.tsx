@@ -3,8 +3,11 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Users, Github, MessageSquare, Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 export const CommunityStats = () => {
+
+  const user = useSelector((state)=>state.auth.user);
 
   const stats = [
     {
@@ -70,9 +73,11 @@ export const CommunityStats = () => {
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link to="/signup">
-            <Button size="lg" className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-slate-900 px-8">
+          {!user && (
+            <Button size="lg" className="bg-gradient-to-r from-blue-500 to-purple-600 active:from-blue-600 active:to-purple-700 text-slate-900 px-8">
               Get Started Free
             </Button>
+          )}
           </Link>
           <Button variant="outline" size="lg" className="border-slate-600 text-slate-700 hover:text-white hover:bg-slate-800">
             Learn More

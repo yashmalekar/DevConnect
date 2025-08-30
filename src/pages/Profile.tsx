@@ -194,12 +194,13 @@ const Profile = () => {
                 </div>
                 
                 {/* Action Buttons */}
+                {user && currentUser.uid === user.uid?null:(
                 <div className="flex flex-col gap-3 w-full max-w-sm">
                   {(currentUser && (user.followers && user.followers.includes(currentUser.uid)) )? (
                     <>
                   <Button 
                     onClick={()=>followRequest(currentUser.uid,true)}
-                    className={'flex-1 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white transition-all duration-200 rounded-xl'}
+                    className={'flex-1 bg-gradient-to-r from-blue-500 to-purple-600 active:from-blue-600 active:to-purple-700 text-white transition-all duration-200 rounded-xl'}
                   >
                     <Users className="w-4 h-4 mr-2" />
                     Following
@@ -212,13 +213,14 @@ const Profile = () => {
                   ):(
                   <Button 
                     onClick={()=>!currentUser ? navigate('/signin') : followRequest(currentUser.uid,false)}
-                    className={'flex-1 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white transition-all duration-200 rounded-xl'}
+                    className={'flex-1 bg-gradient-to-r from-blue-500 to-purple-600 active:from-blue-600 active:to-purple-700 text-white transition-all duration-200 rounded-xl'}
                   >
                     <Users className="w-4 h-4 mr-2" />
                     Follow
                   </Button>
                   )}
                 </div>
+                )}
 
                 {/* Social Links */}
                 <div className="relative mx-auto">

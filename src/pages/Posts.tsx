@@ -25,8 +25,10 @@ const Posts = () => {
   const user = useSelector((state)=>state.auth.user)
 
   useEffect(() => {
+    if(!user)
+      navigate('/signin')
     getPost();
-  }, [])
+  }, [user])
 
     const handleLike = async (docId:String, postOwnerId:String,likesArray:String[]) =>{
     if(!user || !user.uid){
@@ -118,7 +120,7 @@ const Posts = () => {
             </div>
           </div>
           <Button 
-            className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
+            className="bg-gradient-to-r from-blue-500 to-purple-600 active:from-blue-600 active:to-purple-700"
             onClick={() => navigate('/feed/create')}
           >
             Create New Post

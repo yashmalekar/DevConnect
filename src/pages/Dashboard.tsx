@@ -202,7 +202,7 @@ const Dashboard = () => {
 
                   <Button 
                     onClick={() => setShowEditProfile(true)}
-                    className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white"
+                    className="w-full bg-gradient-to-r from-blue-500 to-purple-600 active:from-blue-600 active:to-purple-700 text-white"
                   >
                     Edit Profile
                   </Button>

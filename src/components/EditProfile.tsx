@@ -464,7 +464,7 @@ const EditProfile: React.FC<EditProfileProps> = ({ user, data, onBack }) => {
               </div>
 
               <div className="flex gap-4 pt-4">
-                <Button type="submit" className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white">
+                <Button type="submit" className="bg-gradient-to-r from-blue-500 to-purple-600 active:from-blue-600 active:to-purple-700 text-white">
                   <Save className="w-4 h-4 mr-2" />
                   Save Changes
                 </Button>
@@ -480,7 +480,7 @@ const EditProfile: React.FC<EditProfileProps> = ({ user, data, onBack }) => {
                 
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
-                    <Button variant="destructive" className="bg-red-600 hover:bg-red-700">
+                    <Button variant="destructive" className="bg-red-600 hover:bg-red-600 active:bg-red-700">
                       <Trash2 className="w-4 h-4 mr-2" />
                       Delete Profile
                     </Button>
@@ -520,12 +520,12 @@ const EditProfile: React.FC<EditProfileProps> = ({ user, data, onBack }) => {
                         </div>
                         )}
                     <AlertDialogFooter>
-                      <AlertDialogCancel className="bg-slate-700 text-white border-slate-600 hover:bg-slate-600">
+                      <AlertDialogCancel className="bg-slate-700 text-white hover:text-white border-slate-600 hover:bg-slate-600">
                         Cancel
                       </AlertDialogCancel>
                       <AlertDialogAction 
                         onClick={handleDeleteProfile}
-                        className="bg-red-600 hover:bg-red-700 text-white"
+                        className="bg-red-600 hover:bg-red-600 active:bg-red-700 text-white"
                       >
                         Yes, delete my profile
                       </AlertDialogAction>

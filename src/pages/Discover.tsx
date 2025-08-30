@@ -178,7 +178,7 @@ const Discover = () => {
                 <div className="space-y-2">
                   {(user && (dev.following && dev.followers.includes(user.uid))) ? (
                     <div className="flex gap-2">
-                      <Button onClick={()=>followRequest(dev.uid,true)} className="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white">
+                      <Button onClick={()=>followRequest(dev.uid,true)} className="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 active:from-blue-600 active:to-purple-700 text-white">
                         <Users className="w-4 h-4 mr-2" />
                         Following
                         </Button>
@@ -192,7 +192,7 @@ const Discover = () => {
                         </Button>
                     </div>
                   ):(
-                  <Button onClick={()=>followRequest(dev.uid,false)} className="flex-1 w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white">
+                  <Button onClick={()=>followRequest(dev.uid,false)} className="flex-1 w-full bg-gradient-to-r from-blue-500 to-purple-600 active:from-blue-600 active:to-purple-700 text-white">
                     <Users className="w-4 h-4 mr-2" />
                     Follow
                   </Button>

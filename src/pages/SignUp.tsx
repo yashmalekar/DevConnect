@@ -10,12 +10,18 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Github, Mail, Lock, ArrowLeft, User, MapPin, Link as LinkIcon, Briefcase, X, EyeClosed, Eye } from 'lucide-react';
 import { handleEmailSignUp, handleGithubLogin, handleGoogleAuthLogin } from '../../backend/config.js'
 import { toast } from '@/hooks/use-toast.js';
+import { useSelector } from 'react-redux';
 
 const SignUp = () => {
 
+  const user = useSelector((state)=>state.auth.user);
+
   useEffect(() => {
     window.scrollTo(0,0);
-  }, []);
+    if(user)
+      navigate('/dashboard');
+  }, [user]);
+
   
   const [formData, setFormData] = useState({
     // Basic Information
@@ -474,7 +480,7 @@ const SignUp = () => {
                 </Label>
               </div>
 
-              <Button type="submit" className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white">
+              <Button type="submit" className="w-full bg-gradient-to-r from-blue-500 to-purple-600 active:from-blue-600 active:to-purple-700 text-white">
                 Create Account
               </Button>
             </form>
