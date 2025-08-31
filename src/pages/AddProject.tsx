@@ -18,7 +18,8 @@ const AddProject = () => {
     if(!data)
       navigate('/signin');
   }, [data])
-  
+
+  const [techInput, setTechInput] = useState('');
   const [projectData, setProjectData] = useState({
     uid: data.uid,
     title: '',
@@ -26,13 +27,11 @@ const AddProject = () => {
     author: data.firstName + data.lastName,
     username: data.username,
     avatar: data.profilePicture || '',
-    githubUrl: data.githubUrl || '',
+    githubUrl: data.githubUrl ||'',
     demoUrl: '',
     image: '',
     tech: [] as string[],
   });
-  const [techInput, setTechInput] = useState('');
-  const [gitUrl, setGitUrl] = useState('');
 
   const handleAddTech = () => {
     if (techInput.trim() && !projectData.tech.includes(techInput.trim())) {
@@ -124,8 +123,8 @@ const AddProject = () => {
                   <Label htmlFor="githubUrl" className="text-slate-300">GitHub URL (Optional)</Label>
                   <Input
                     id="githubUrl"
-                    value={gitUrl}
-                    onChange={(e)=>setGitUrl(e.target.value)}
+                    value={projectData.githubUrl}
+                    onChange={(e)=>setProjectData(prev => ({ ...prev, githubUrl: e.target.value }))}
                     placeholder="https://github.com/username/repo"
                     className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400"
                   />
