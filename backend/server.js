@@ -378,5 +378,16 @@ app.post('/delete-user-references', async(req,res)=>{
     })
 })
 
+//Edit Project
+app.post('/edit-project',async (req,res)=>{
+    const {uid, projectId, updatedData } = req.body;
+    try {
+        await db.collection('users').doc(uid).collection('projects').doc(projectId).update(updatedData);
+        res.json({ message: 'Project updated successfully' });
+    } catch (error) {
+        res.json({message:error.message});
+    }
+})
+
 
 server.listen(5000,()=>console.log('Server running on port 5000'));

@@ -7,10 +7,18 @@ import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Github, ExternalLink, Code, MoreHorizontal} from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { toast } from '@/hooks/use-toast';
 
 const UserProjects = () => {
   const navigate = useNavigate();
   const user = useSelector((state) => state.auth.data);
+  const [editProject, setEditProject] = useState(null);
+  const [isEditOpen,setIsEditOpen] = useState(false);
+  const [isEditTags, setIsEditTags] = useState('');
 
     useEffect(() => {
       if(!user)
@@ -30,7 +38,39 @@ const UserProjects = () => {
     const deleteProject = async (id:String,uid:String)=>{
       setProjects(prev=>prev.filter((project)=>project.id!==id))
       await fetch('http://localhost:5000/delete-project',{method:"POST",headers:{'Content-Type':'application/json'},body:JSON.stringify({id,uid})});
+      toast({
+        title: "Project deleted",
+        variant:"destructive",
+        description: "Your Project has been successfully deleted.",
+      })
     }
+
+    const handleEditProject = async (project:any)=>{
+      setEditProject(project);
+      setIsEditOpen(true);
+      setIsEditTags(project.tech.join(', '));
+    }
+
+    const handleSaveEdit = async()=>{
+      setIsEditOpen(false);
+      const updatedProjects = projects.map((project)=>
+        project.id === editProject.id ?
+        {
+          ...editProject,
+          tech: isEditTags.split(', ').map((tag)=>tag.trim()).filter((tag)=>tag),
+        }
+        : project
+      );
+      setProjects(updatedProjects);
+      const res = await fetch('http://localhost:5000/edit-project',{method:"POST",headers:{'Content-Type':'application/json'},body:JSON.stringify({uid:editProject.uid,projectId:editProject.id,updatedData:updatedProjects.filter((project) => project.id === editProject.id)[0]})});
+      if(res.ok){
+        toast({
+          title: "Project updated",
+          description: "Your Project has been successfully updated.",
+        });
+      }
+      setEditProject(null);
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
@@ -74,12 +114,14 @@ const UserProjects = () => {
                     />
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant='ghost' className='absolute top-2 right-2 rounded-lg hover:text-white hover:bg-primary transition-all duration-300 cursor-pointer'>
+                        <Button variant='default' className='absolute top-2 right-2 rounded-lg hover:text-white hover:bg-primary transition-all duration-300 cursor-pointer'>
                           <MoreHorizontal className='w-6 h-6' />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align='start' className='bg-primary text-white border-primary'>
-                        <DropdownMenuItem>Edit</DropdownMenuItem>
+                        <DropdownMenuItem onClick={()=>handleEditProject(project)} className='cursor-pointer'>
+                          Edit
+                        </DropdownMenuItem>
                         <DropdownMenuItem onClick={()=>deleteProject(project.id,project.uid)} className="hover:bg-destructive focus:bg-destructive cursor-pointer hover:text-destructive-foreground focus:text-destructive-foreground">Delete</DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -87,6 +129,62 @@ const UserProjects = () => {
                 )}
               </div>
 
+              <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+                <DialogContent className='bg-slate-800 border-slate-800'>
+                  <DialogHeader>
+                    <DialogTitle className='text-white'>Edit Project</DialogTitle>
+                    <DialogDescription className='text-slate-400'>
+                      Make changes to your project here. Click save when you're done.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label className='text-white'>Project Title</Label>
+                      <Input
+                      defaultValue={project?.title}
+                      onChange={(e)=>setEditProject({...editProject,title:e.target.value})}
+                      className="bg-slate-700 border-slate-600 text-white"
+                      placeholder='Project title' />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className='text-white'>Project Description</Label>
+                      <Textarea
+                      defaultValue={project?.description}
+                      onChange={(e)=>setEditProject({...editProject,description:e.target.value})}
+                      className="min-h-[100px] rounded-md bg-slate-700 border-slate-600 text-white"
+                      placeholder='Project description' />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className='text-white'>Technologies (comma and space separated)</Label>
+                      <Input defaultValue={isEditTags}
+                      onChange={(e)=>setIsEditTags(e.target.value)}
+                      className="bg-slate-700 border-slate-600 text-white"
+                      placeholder='Tech used' />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className='text-white'>Github Link</Label>
+                    <Input
+                    defaultValue={project?.githubUrl}
+                    onChange={(e)=>setEditProject({...editProject,githubUrl:e.target.value})}
+                    className="bg-slate-700 border-slate-600 text-white"
+                    placeholder='Github link' />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className='text-white'>Demo Link</Label>
+                    <Input
+                    defaultValue={project?.demoUrl}
+                    onChange={(e)=>setEditProject({...editProject,demoUrl:e.target.value})}
+                    className="bg-slate-700 border-slate-600 text-white"
+                    placeholder='Demo URL' />
+                  </div>
+                  <DialogFooter>
+                    <Button type='submit' onClick={handleSaveEdit} className='bg-blue-600 active-bg-blue-700 hover:bg-blue-600'>
+                      Save Changes
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
 
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
