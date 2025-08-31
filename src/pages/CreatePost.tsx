@@ -15,7 +15,6 @@ import { uploadPostImage } from '../../backend/utils.js'
 const CreatePost = () => {
   const navigate = useNavigate();
   const data = useSelector((state)=>state.auth.data);
-  const [gitUrl, setGitUrl] = useState('');
   const [imageFiles, setImageFiles] = useState<File[] | null>(null);
   const [postData, setPostData] = useState({
     uid: data.uid,
@@ -24,7 +23,7 @@ const CreatePost = () => {
     username: data.username,
     content: '',
     tags: [] as string[],
-    githubLink: gitUrl || data.githubUrl || '',
+    githubLink: data.githubUrl || '',
     images: [] as string[]
   });
   const [tagInput, setTagInput] = useState('');
@@ -196,8 +195,8 @@ const CreatePost = () => {
                 <Label htmlFor="githubLink" className="text-slate-300">GitHub Link (Optional)</Label>
                 <Input
                   id="githubLink"
-                  value={gitUrl}
-                  onChange={(e)=>setGitUrl(e.target.value)}
+                  value={data?.githubUrl || postData?.githubLink}
+                  onChange={(e)=>setPostData(prev => ({ ...prev, githubLink: e.target.value }))}
                   placeholder="https://github.com/username/repo"
                   className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400"
                 />
