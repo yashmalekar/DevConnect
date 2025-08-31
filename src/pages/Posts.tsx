@@ -275,7 +275,7 @@ const Posts = () => {
                               <Button 
                                 type="submit" 
                                 onClick={handleSaveEdit}
-                                className="bg-blue-600 hover:bg-blue-700"
+                                className="bg-blue-600 active:bg-blue-700 hover:bg-blue-600"
                               >
                                 Save changes
                               </Button>
