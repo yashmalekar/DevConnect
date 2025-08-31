@@ -147,10 +147,9 @@ const Projects = () => {
                   )}
                   {project.githubUrl && (
                   <Button variant="outline" className="border-slate-600 text-slate-700 hover:text-white hover:bg-primary">
-                    <Github className="w-4 h-4 mr-2" />
-                    <a target='_blank' href={project.githubUrl}>
-                      Code
-                    </a>
+                    <Link to={project.githubUrl}>
+                      <Github className="w-4 h-4" />
+                    </Link>
                   </Button>
                   )}
                 </div>
