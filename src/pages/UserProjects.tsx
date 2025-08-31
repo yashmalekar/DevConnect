@@ -4,8 +4,9 @@ import { Header } from '@/components/Header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Github, ExternalLink, Code} from 'lucide-react';
+import { ArrowLeft, Github, ExternalLink, Code, MoreHorizontal} from 'lucide-react';
 import { useSelector } from 'react-redux';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
 const UserProjects = () => {
   const navigate = useNavigate();
@@ -24,6 +25,11 @@ const UserProjects = () => {
       const data = await fetch('http://localhost:5000/get-projects').then(res=>res.json());
       const projects1 = data.filter((project)=>project.uid===user.uid);
       setProjects(projects1); 
+    }
+
+    const deleteProject = async (id:String,uid:String)=>{
+      setProjects(prev=>prev.filter((project)=>project.id!==id))
+      await fetch('http://localhost:5000/delete-project',{method:"POST",headers:{'Content-Type':'application/json'},body:JSON.stringify({id,uid})});
     }
 
   return (
@@ -66,9 +72,21 @@ const UserProjects = () => {
                       alt={project.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant='ghost' className='absolute top-2 right-2 rounded-lg hover:text-white hover:bg-primary transition-all duration-300 cursor-pointer'>
+                          <MoreHorizontal className='w-6 h-6' />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align='start' className='bg-primary text-white border-primary'>
+                        <DropdownMenuItem>Edit</DropdownMenuItem>
+                        <DropdownMenuItem onClick={()=>deleteProject(project.id,project.uid)} className="hover:bg-destructive focus:bg-destructive cursor-pointer hover:text-destructive-foreground focus:text-destructive-foreground">Delete</DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                 )}
               </div>
+
 
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">

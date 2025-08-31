@@ -108,6 +108,18 @@ app.post('/create-project',async(req,res)=>{
     }
 })
 
+//Delete Project
+app.post('/delete-project',async(req,res)=>{
+    const { id, uid } = req.body;
+    try {
+        await db.collection('users').doc(uid).collection('projects').doc(id).delete();
+        await db.collection('users').doc(uid).update({projects: admin.firestore.FieldValue.arrayRemove(id)})
+        res.json({ message: 'Project deleted successfully' });
+    } catch (error) {
+        res.json({message:error.message});
+    }
+})
+
 //Get All Users
 app.get('/get-users', async(req,res)=>{
     try {
@@ -142,7 +154,7 @@ app.get('/get-projects', async(req,res)=>{
     try {
         const data = await db.collectionGroup('projects').get();
         if(!data.empty){
-            res.json(data.docs.map(doc =>({dodId: doc.id,...doc.data()})));
+            res.json(data.docs.map(doc =>({id: doc.id,...doc.data()})));
         }else{
             res.json([]);
         }
