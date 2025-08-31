@@ -89,6 +89,7 @@ const Posts = () => {
     await fetch("http://localhost:5000/delete-post",{method:"POST", headers:{"Content-Type":"application/json"},body:JSON.stringify({docId:postId, uid: user.uid, imageUrls})});
     toast({
       title: "Post deleted",
+      className:'bg-green-600 text-white border-green-500',
       description: "Your post has been successfully deleted.",
     });
   };
